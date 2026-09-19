@@ -32,6 +32,8 @@ jobs:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           cache: true
       - run: flutter pub get
+      - name: Generate code
+        run: dart run build_runner build --delete-conflicting-outputs
       - name: Check formatting
         run: dart format --output=none --set-exit-if-changed .
       - name: Static analysis
@@ -63,6 +65,8 @@ jobs:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           cache: true
       - run: flutter pub get
+      - name: Generate code
+        run: dart run build_runner build --delete-conflicting-outputs
       - name: Build debug APK
         run: flutter build apk --debug
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
