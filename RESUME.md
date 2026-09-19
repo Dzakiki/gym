@@ -9,27 +9,26 @@ Last updated: 2026-09-20. Read this first, then `IMPLEMENTATION_PLAN.md` for the
 | Phase 0 (tools, repo, CI, branch protection) | Done |
 | PR #1 Flutter scaffold + strict lints + CI | Merged |
 | PR #2 App shell (theme, go_router, 5 tabs) | Merged |
-| Drift database schema (`feat/p1-data-layer`) | **Finished locally, committed locally, NOT pushed, no PR yet** |
+| Drift database schema, PR #3 (`feat/p1-data-layer`) | **Open on GitHub. `analyze-test` passed; `android-build` was still running when work stopped. Not merged.** One extra local commit (this file) is not pushed. |
 | Phone connected for testing | Not yet (not needed until Phase 2) |
 
 `main` is protected: PR required, checks `analyze-test` and `android-build` must pass, squash-merge only.
 
 ## First thing to do when resuming
 
-The data-layer branch is ready. Push it and open the PR:
+Finish PR #3 (the data layer):
 
 ```bash
 cd C:\Users\AhmadDzaki\gym-app
+gh pr checks 3                  # both checks must be green; re-run from the Actions tab if one failed
 git switch feat/p1-data-layer
-git status                      # should be clean
-flutter analyze && flutter test # expect: no issues, 16 tests pass
-git push -u origin feat/p1-data-layer
-gh pr create --base main --title "feat(data): add offline Drift database schema" --fill
-gh pr checks --watch            # wait for green
-gh pr merge --squash --delete-branch
+git push                        # pushes the local RESUME.md commit; CI runs again
+gh pr checks 3 --watch          # wait for green
+gh pr merge 3 --squash --delete-branch
 git switch main && git pull
 ```
 
+If a check fails, read the log with `gh run view --log-failed`, fix on the branch, push, and wait again.
 Commit messages end with `Co-Authored-By: Claude Sonnet 5 <noreply@anthropic.com>`; PR bodies end with the Claude Code line.
 
 ## Next features (one branch + PR each, Phase 1)
