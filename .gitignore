@@ -1,0 +1,66 @@
+# --- Secrets (repo is PUBLIC: never commit these) ---
+.env
+.env.*
+!.env.example
+**/key.properties
+*.jks
+*.keystore
+*.p12
+*.p8
+*.pem
+*.mobileprovision
+*service-account*.json
+**/google-services.json
+**/GoogleService-Info.plist
+supabase/.env
+supabase/.temp/
+supabase/.branches/
+
+# --- Coach recordings (on-device only, may contain personal video) ---
+*.mp4
+*.mov
+*.keypoints.gz
+
+# --- Flutter / Dart ---
+.dart_tool/
+.packages
+.pub-cache/
+.pub/
+build/
+coverage/
+*.g.dart.bak
+.flutter-plugins
+.flutter-plugins-dependencies
+.metadata
+flutter_*.png
+pubspec_overrides.yaml
+# Generated code is produced in CI by build_runner; keep it out of git.
+*.g.dart
+*.freezed.dart
+
+# --- Android ---
+**/android/.gradle/
+**/android/captures/
+**/android/local.properties
+**/android/gradlew.bat.bak
+**/android/app/debug/
+**/android/app/profile/
+**/android/app/release/
+*.hprof
+
+# --- iOS ---
+**/ios/Pods/
+**/ios/.symlinks/
+**/ios/Flutter/Generated.xcconfig
+**/ios/Flutter/flutter_export_environment.sh
+**/ios/**/xcuserdata/
+**/ios/**/DerivedData/
+
+# --- IDE / OS ---
+.idea/
+*.iml
+.vscode/*
+!.vscode/extensions.json
+.DS_Store
+Thumbs.db
+*.log
