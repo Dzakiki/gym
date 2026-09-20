@@ -32,7 +32,8 @@ Read this first, then `IMPLEMENTATION_PLAN.md` for the full design.
 | Home screen (streak, today's routine, resume) | Merged (PR #26) |
 | Progress: weekly volume chart, form-score chart, personal records | Merged (PR #27) |
 | Custom exercises (create in the library, delete your own) | Merged (PR #28) |
-| Routine builder asks before discarding unsaved changes | In the latest PR (see `git log`) |
+| Routine builder asks before discarding unsaved changes | Merged (PR #29) |
+| Spoken coach cues (`flutter_tts`, follows the Profile switch) | In the latest PR (see `git log`) |
 
 `main` is protected: PR required, checks `analyze-test` and `android-build` must pass, squash-merge only.
 
@@ -42,7 +43,7 @@ Form Coach engine (pure Dart, no phone needed; build in this order, test with sy
 
 - The squat is the template: see `lib/features/form_coach/exercises/squat.dart` (metrics, limits, rules) and `lib/features/form_coach/demo/pose_synth.dart` (generates squat frames from joint angles; extend it with push-up, lunge, plank and jumping-jack poses).
 - **All the agreed bodyweight exercises are coached** (squat, push-up, plank, dip, pull-up, lunge, jumping jack), each as one definition in `lib/features/form_coach/exercises/` with a synthetic pose generator in `lib/features/form_coach/demo/` and tests. All thresholds are starting values worked out on generated poses only; **they must be tuned with real recordings**. Known gaps: squat heel-lift rule (needs a heel baseline), walking (alternating) lunges, side-view detection of exercises filmed at the wrong angle, and per-user calibration. Adding another exercise: definition + registry entry + `coachKey` in `assets/seed/exercises.json` (a test keeps the two in step).
-- TTS: implement `CuePlayer` with `flutter_tts` and override `cuePlayerProvider` (needs a real device to check).
+- TTS is written (`tts_cue_player.dart`) but **never heard on a device**: check the voice, speed and that a new cue cuts off the old one. Possible follow-ups: speak the rep count, duck music (audio focus).
 - Camera pipeline (needs the phone): `camera` image stream, ML Kit detector implementing a `PoseSource`, coordinate mapping to image-height units, permission flow.
 
 Workout tracking leftovers:
