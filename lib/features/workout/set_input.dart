@@ -1,4 +1,5 @@
 import 'package:flutter/services.dart';
+import 'package:formcoach/domain/weight_unit.dart';
 
 /// Rejects edits that would make a number larger than [max].
 ///
@@ -25,8 +26,12 @@ int? parseWholeNumber(String text) => int.tryParse(text.trim());
 double? parseWeight(String text) =>
     double.tryParse(text.trim().replaceAll(',', '.'));
 
-/// Formats a weight for a text field: `60` for 60.0 and `62.5` for 62.5.
-String formatWeight(double? kg) {
+/// Formats a weight given in kilograms for a text field in [unit]: `60` for
+/// 60.0 and `62.5` for 62.5, rounded to one decimal place.
+String formatWeight(double? kg, {WeightUnit unit = WeightUnit.kg}) {
   if (kg == null) return '';
-  return kg == kg.roundToDouble() ? kg.round().toString() : kg.toString();
+  final value = (unit.fromKg(kg) * 10).round() / 10;
+  return value == value.roundToDouble()
+      ? value.round().toString()
+      : value.toString();
 }

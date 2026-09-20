@@ -1,3 +1,5 @@
+import 'package:formcoach/domain/weight_unit.dart';
+
 /// Formats seconds as a clock, e.g. `1:05`.
 String formatClock(int totalSeconds) {
   final seconds = totalSeconds < 0 ? 0 : totalSeconds;
@@ -17,13 +19,13 @@ String formatDuration(Duration duration) {
       : '${totalMinutes ~/ 60} h $minutes min';
 }
 
-/// Formats a training volume in kilograms, e.g. `1,440 kg`.
-String formatVolume(double kg) {
-  final rounded = kg.round().toString();
+/// Formats a training volume given in kilograms in [unit], e.g. `1,440 kg`.
+String formatVolume(double kg, {WeightUnit unit = WeightUnit.kg}) {
+  final rounded = unit.fromKg(kg).round().toString();
   final buffer = StringBuffer();
   for (var i = 0; i < rounded.length; i++) {
     if (i > 0 && (rounded.length - i) % 3 == 0) buffer.write(',');
     buffer.write(rounded[i]);
   }
-  return '$buffer kg';
+  return '$buffer ${unit.label}';
 }

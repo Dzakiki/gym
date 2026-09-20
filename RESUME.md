@@ -26,7 +26,8 @@ Read this first, then `IMPLEMENTATION_PLAN.md` for the full design.
 | Coach exercise: dips (parallel bars or two chairs) | Merged (PR #19) |
 | Coach exercise: pull-up | Merged (PR #20) |
 | Coach exercise: lunge | Merged (PR #21) |
-| Coach exercise: jumping jack (front view) | In the latest PR (see `git log`) |
+| Coach exercise: jumping jack (front view) | Merged (PR #22) |
+| Settings: kg/lb and spoken-cue switch, Profile screen | In the latest PR (see `git log`) |
 
 `main` is protected: PR required, checks `analyze-test` and `android-build` must pass, squash-merge only.
 

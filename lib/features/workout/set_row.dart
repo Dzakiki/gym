@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:formcoach/data/local/app_database.dart';
 import 'package:formcoach/data/providers.dart';
 import 'package:formcoach/data/repositories/workout_repository.dart';
+import 'package:formcoach/features/settings/settings_providers.dart';
 import 'package:formcoach/features/workout/rest_timer.dart';
 import 'package:formcoach/features/workout/set_input.dart';
 
@@ -20,6 +21,7 @@ class SetRow extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final repository = ref.read(workoutRepositoryProvider);
+    final unit = ref.watch(weightUnitProvider);
     final done = set.completedAt != null;
     final timed = set.durationSeconds != null;
     final number = set.setIndex + 1;
@@ -48,13 +50,20 @@ class SetRow extends ConsumerWidget {
             ),
             Expanded(
               child: _NumberField(
-                key: ValueKey('weight-${set.id}'),
-                label: 'kg',
-                initialValue: formatWeight(set.weightKg),
+                key: ValueKey('weight-${set.id}-${unit.name}'),
+                label: unit.label,
+                initialValue: formatWeight(set.weightKg, unit: unit),
                 decimal: true,
-                max: WorkoutRepository.maxWeightKg,
-                onChanged: (text) =>
-                    repository.updateSetWeight(set.id, parseWeight(text)),
+                max: unit.fromKg(WorkoutRepository.maxWeightKg),
+                onChanged: (text) {
+                  final typed = parseWeight(text);
+                  final kg = typed == null
+                      ? null
+                      : unit
+                            .toKg(typed)
+                            .clamp(0.0, WorkoutRepository.maxWeightKg);
+                  repository.updateSetWeight(set.id, kg);
+                },
               ),
             ),
             const SizedBox(width: 8),
