@@ -13,18 +13,17 @@ Read this first, then `IMPLEMENTATION_PLAN.md` for the full design.
 | Program templates, routine repository, routine screens | Merged (PR #5) |
 | Routine builder (create, edit, reorder, targets, schedule) | Merged (PR #6) |
 | Workout repository (log sets, finish, discard) | Merged (PR #7) |
-| Active workout screen + in-app rest timer | In the latest PR (see `git log`) |
-| History | **Next** |
+| Active workout screen + in-app rest timer | Merged (PR #8) |
+| History (Progress tab list + workout detail + delete) | In the latest PR (see `git log`) |
 
 `main` is protected: PR required, checks `analyze-test` and `android-build` must pass, squash-merge only.
 
 ## Next features (one branch + PR each)
 
 1. `feat/p1-rest-notification`: notify when the rest timer ends while the app is in the background (`flutter_local_notifications` + `timezone`, Android 13+ notification permission, exact-alarm consideration). The in-app timer already vibrates when it ends.
-2. `feat/p1-history` (do this first): history list and session detail (sets per exercise).
-3. `feat/p1-settings-units`: kg/lb setting (weights are stored in kg), custom exercise creation UI (the repository already supports it), unsaved-changes prompt in the routine builder.
-4. Tag `v0.1.0` (bump `pubspec.yaml` version in a PR, then `git tag v0.1.0 && git push --tags`).
-5. Phase 2 (camera + pose spike) **needs the Android phone plugged in with USB debugging on**.
+2. `feat/p1-settings-units`: kg/lb setting (weights are stored in kg), custom exercise creation UI (the repository already supports it), unsaved-changes prompt in the routine builder.
+3. Tag `v0.1.0` (bump `pubspec.yaml` version in a PR, then `git tag v0.1.0 && git push --tags`).
+4. Phase 2 (camera + pose spike) **needs the Android phone plugged in with USB debugging on**.
 
 ## How to work
 

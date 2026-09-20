@@ -51,6 +51,21 @@ class WorkoutSummary {
   final double volumeKg;
 }
 
+/// A finished workout in the history list.
+class HistoryEntry {
+  const HistoryEntry({
+    required this.session,
+    required this.completedSets,
+    required this.volumeKg,
+  });
+
+  final WorkoutSession session;
+  final int completedSets;
+  final double volumeKg;
+
+  Duration get duration => session.endedAt!.difference(session.startedAt);
+}
+
 /// Starts, edits and finishes workouts.
 class WorkoutRepository {
   WorkoutRepository({
@@ -82,6 +97,46 @@ class WorkoutRepository {
   /// The workout in progress right now, or null.
   Future<WorkoutSession?> getActiveSession() =>
       _activeQuery().getSingleOrNull();
+
+  /// Finished workouts, newest first. Emits again when they change.
+  Stream<List<HistoryEntry>> watchHistory() => watchLoad(
+    database: _database,
+    tables: [_database.workoutSessions, _database.setLogs],
+    load: _loadHistory,
+  );
+
+  Future<List<HistoryEntry>> _loadHistory() async {
+    final sessions =
+        await (_database.select(_database.workoutSessions)
+              ..where((s) => s.endedAt.isNotNull() & s.deletedAt.isNull())
+              ..orderBy([(s) => OrderingTerm.desc(s.endedAt)]))
+            .get();
+    if (sessions.isEmpty) return const [];
+
+    final sets =
+        await (_database.select(_database.setLogs)..where(
+              (s) =>
+                  s.sessionId.isIn([for (final s in sessions) s.id]) &
+                  s.completedAt.isNotNull() &
+                  s.deletedAt.isNull(),
+            ))
+            .get();
+    final bySession = <String, List<SetLog>>{};
+    for (final set in sets) {
+      bySession.putIfAbsent(set.sessionId, () => []).add(set);
+    }
+    return [
+      for (final session in sessions)
+        HistoryEntry(
+          session: session,
+          completedSets: bySession[session.id]?.length ?? 0,
+          volumeKg: (bySession[session.id] ?? const <SetLog>[]).fold(
+            0,
+            (sum, s) => sum + (s.reps ?? 0) * (s.weightKg ?? 0),
+          ),
+        ),
+    ];
+  }
 
   /// The workout with [id] and its sets, or null if it does not exist.
   Stream<ActiveWorkout?> watchWorkout(String id) => watchLoad(
@@ -411,7 +466,7 @@ class WorkoutRepository {
     });
   }
 
-  /// Deletes an unfinished workout and its sets.
+  /// Deletes a workout (unfinished or finished) and its sets.
   Future<void> discardWorkout(String sessionId) {
     return _database.transaction(() async {
       final now = _clock();
