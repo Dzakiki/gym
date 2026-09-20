@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:formcoach/core/date_format.dart';
 import 'package:formcoach/core/widgets/empty_state.dart';
+import 'package:formcoach/data/local/app_database.dart';
 import 'package:formcoach/data/providers.dart';
 import 'package:formcoach/data/repositories/workout_repository.dart';
 import 'package:formcoach/domain/weight_unit.dart';
+import 'package:formcoach/features/history/history_providers.dart';
 import 'package:formcoach/features/history/set_formatting.dart';
 import 'package:formcoach/features/settings/settings_providers.dart';
 import 'package:formcoach/features/workout/workout_formatting.dart';
@@ -45,7 +47,13 @@ class WorkoutDetailScreen extends ConsumerWidget {
                 title: 'Workout not found',
                 message: 'It may have been deleted.',
               )
-            : _Body(workout: item, unit: ref.watch(weightUnitProvider)),
+            : _Body(
+                workout: item,
+                unit: ref.watch(weightUnitProvider),
+                analyses:
+                    ref.watch(coachAnalysesProvider(workoutId)).value ??
+                    const {},
+              ),
       ),
     );
   }
@@ -75,11 +83,24 @@ class WorkoutDetailScreen extends ConsumerWidget {
   }
 }
 
+/// A short note about the coach's score for a set, or nothing.
+String _coachNote(CoachAnalysis? analysis) {
+  final score = analysis?.setScore;
+  return score == null ? '' : '  (AI Coach ${score.round()})';
+}
+
 class _Body extends StatelessWidget {
-  const _Body({required this.workout, required this.unit});
+  const _Body({
+    required this.workout,
+    required this.unit,
+    required this.analyses,
+  });
 
   final ActiveWorkout workout;
   final WeightUnit unit;
+
+  /// The coach's analysis of coached sets, by set id.
+  final Map<String, CoachAnalysis> analyses;
 
   @override
   Widget build(BuildContext context) {
@@ -131,7 +152,8 @@ class _Body extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 2),
                       child: Text(
-                        'Set ${set.setIndex + 1}:  ${formatSetLog(set, unit: unit)}',
+                        'Set ${set.setIndex + 1}:  ${formatSetLog(set, unit: unit)}'
+                        '${_coachNote(analyses[set.id])}',
                         style: theme.textTheme.bodyLarge,
                       ),
                     ),

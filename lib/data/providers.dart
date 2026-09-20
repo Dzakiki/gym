@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:formcoach/core/clock.dart';
 import 'package:formcoach/core/ids.dart';
 import 'package:formcoach/data/local/app_database.dart';
+import 'package:formcoach/data/repositories/coach_repository.dart';
 import 'package:formcoach/data/repositories/exercise_repository.dart';
 import 'package:formcoach/data/repositories/routine_repository.dart';
 import 'package:formcoach/data/repositories/workout_repository.dart';
@@ -27,6 +28,14 @@ final exerciseRepositoryProvider = Provider<ExerciseRepository>((ref) {
 
 final routineRepositoryProvider = Provider<RoutineRepository>((ref) {
   return RoutineRepository(
+    database: ref.watch(appDatabaseProvider),
+    clock: ref.watch(clockProvider),
+    newId: ref.watch(idGeneratorProvider),
+  );
+});
+
+final coachRepositoryProvider = Provider<CoachRepository>((ref) {
+  return CoachRepository(
     database: ref.watch(appDatabaseProvider),
     clock: ref.watch(clockProvider),
     newId: ref.watch(idGeneratorProvider),

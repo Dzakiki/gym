@@ -93,8 +93,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       // Full screen, above the tab bar, so the whole picture is visible.
       GoRoute(
         path: '/coach-session/:key',
-        builder: (context, state) =>
-            CoachSessionScreen(coachKey: state.pathParameters['key']!),
+        builder: (context, state) => CoachSessionScreen(
+          coachKey: state.pathParameters['key']!,
+          setLogId: state.uri.queryParameters['set'],
+        ),
       ),
       // Full screen, above the tab bar, so nothing distracts while training.
       GoRoute(

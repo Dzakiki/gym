@@ -27,7 +27,8 @@ Read this first, then `IMPLEMENTATION_PLAN.md` for the full design.
 | Coach exercise: pull-up | Merged (PR #20) |
 | Coach exercise: lunge | Merged (PR #21) |
 | Coach exercise: jumping jack (front view) | Merged (PR #22) |
-| Settings: kg/lb and spoken-cue switch, Profile screen | In the latest PR (see `git log`) |
+| Settings: kg/lb and spoken-cue switch, Profile screen | Merged (PR #24) |
+| Coached sets saved into workouts (`coach_analyses`, schema v2 migration), Start with AI Coach | In the latest PR (see `git log`) |
 
 `main` is protected: PR required, checks `analyze-test` and `android-build` must pass, squash-merge only.
 
@@ -37,14 +38,13 @@ Form Coach engine (pure Dart, no phone needed; build in this order, test with sy
 
 - The squat is the template: see `lib/features/form_coach/exercises/squat.dart` (metrics, limits, rules) and `lib/features/form_coach/demo/pose_synth.dart` (generates squat frames from joint angles; extend it with push-up, lunge, plank and jumping-jack poses).
 - **All the agreed bodyweight exercises are coached** (squat, push-up, plank, dip, pull-up, lunge, jumping jack), each as one definition in `lib/features/form_coach/exercises/` with a synthetic pose generator in `lib/features/form_coach/demo/` and tests. All thresholds are starting values worked out on generated poses only; **they must be tuned with real recordings**. Known gaps: squat heel-lift rule (needs a heel baseline), walking (alternating) lunges, side-view detection of exercises filmed at the wrong angle, and per-user calibration. Adding another exercise: definition + registry entry + `coachKey` in `assets/seed/exercises.json` (a test keeps the two in step).
-- Save a coached set into the workout: a `coach_analyses` table (schema in section 6 of the plan), a "Start with AI Coach" button on coach-supported exercises in the active workout that fills reps and marks the set `coached`, and a form-score trend on the Progress tab.
 - TTS: implement `CuePlayer` with `flutter_tts` and override `cuePlayerProvider` (needs a real device to check).
 - Camera pipeline (needs the phone): `camera` image stream, ML Kit detector implementing a `PoseSource`, coordinate mapping to image-height units, permission flow.
 
 Workout tracking leftovers:
 
 1. `feat/p1-rest-notification`: notify when the rest timer ends while the app is in the background (`flutter_local_notifications` + `timezone`, Android 13+ notification permission, exact-alarm consideration). The in-app timer already vibrates when it ends.
-2. `feat/p1-settings-units`: kg/lb setting (weights are stored in kg), custom exercise creation UI (the repository already supports it), unsaved-changes prompt in the routine builder.
+2. Custom exercise creation UI (the repository already supports it) and an unsaved-changes prompt in the routine builder. (kg/lb is done.)
 3. Tag `v0.1.0` (bump `pubspec.yaml` version in a PR, then `git tag v0.1.0 && git push --tags`).
 4. Phase 2 (camera + pose spike) **needs the Android phone plugged in with USB debugging on**.
 
@@ -91,6 +91,8 @@ Commit messages end with `Co-Authored-By: Claude Sonnet 5 <noreply@anthropic.com
 - Widget tests use `test/helpers/app_harness.dart` (`appTest`), which seeds an in-memory database and disposes the tree before closing it (Drift schedules timers on stream cancel).
 - App id `com.dzakiki.formcoach` is permanent once published. Git commits use the email from git config (visible on the public repo).
 - Android SDK licences were accepted during setup.
+
+- The database is at schema version 2. Any table added later needs an `onUpgrade` step in `AppDatabase.migration` (see the v2 one) and a test like `test/data/local/migration_test.dart`.
 
 ## Gotchas
 

@@ -9,6 +9,7 @@ import 'package:formcoach/data/local/app_database.dart';
 import 'package:formcoach/data/providers.dart';
 import 'package:formcoach/data/repositories/workout_repository.dart';
 import 'package:formcoach/domain/weight_unit.dart';
+import 'package:formcoach/features/form_coach/exercises/registry.dart';
 import 'package:formcoach/features/settings/settings_providers.dart';
 import 'package:formcoach/features/workout/rest_banner.dart';
 import 'package:formcoach/features/workout/rest_timer.dart';
@@ -230,6 +231,24 @@ class _ExerciseCard extends ConsumerWidget {
   final String sessionId;
   final ActiveExercise exercise;
 
+  /// Opens the coach for the first set that is not done yet; the results are
+  /// saved into that set.
+  void _startCoach(BuildContext context) {
+    final open = exercise.sets.where((s) => s.completedAt == null);
+    if (open.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Add a set first, then coach it.')),
+      );
+      return;
+    }
+    context.push(
+      AppRoutes.coachSession(
+        exercise.exercise.coachKey!,
+        setLogId: open.first.id,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Card(
@@ -243,6 +262,15 @@ class _ExerciseCard extends ConsumerWidget {
               exercise.exercise.name,
               style: Theme.of(context).textTheme.titleMedium,
             ),
+            if (coachDefinitionFor(exercise.exercise.coachKey) != null)
+              Align(
+                alignment: Alignment.centerLeft,
+                child: TextButton.icon(
+                  icon: const Icon(Icons.videocam_outlined),
+                  label: const Text('Start with AI Coach'),
+                  onPressed: () => _startCoach(context),
+                ),
+              ),
             const SizedBox(height: 8),
             for (final set in exercise.sets)
               SetRow(
