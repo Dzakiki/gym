@@ -2,6 +2,7 @@ import 'package:drift/drift.dart' show driftRuntimeOptions;
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:formcoach/app/app.dart';
 import 'package:formcoach/data/local/app_database.dart';
@@ -18,8 +19,9 @@ import 'file_asset_bundle.dart';
 /// disposed and one more frame is pumped before the test ends.
 void appTest(
   String description,
-  Future<void> Function(WidgetTester tester, AppDatabase db) body,
-) {
+  Future<void> Function(WidgetTester tester, AppDatabase db) body, {
+  List<Override> overrides = const [],
+}) {
   driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
 
   testWidgets(description, (tester) async {
@@ -49,7 +51,7 @@ void appTest(
 
     await tester.pumpWidget(
       ProviderScope(
-        overrides: [appDatabaseProvider.overrideWithValue(db)],
+        overrides: [appDatabaseProvider.overrideWithValue(db), ...overrides],
         child: const FormCoachApp(),
       ),
     );

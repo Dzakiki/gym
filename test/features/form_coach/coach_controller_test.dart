@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:fake_async/fake_async.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -9,16 +7,7 @@ import 'package:formcoach/features/form_coach/demo/pose_synth.dart';
 import 'package:formcoach/features/form_coach/pose/pose.dart';
 import 'package:formcoach/features/form_coach/pose/pose_source.dart';
 
-/// A pose source the test pushes frames into.
-class _ControlledSource implements PoseSource {
-  // Broadcast, so closing works even if nobody ever listened.
-  final controller = StreamController<PoseFrame>.broadcast();
-
-  @override
-  Stream<PoseFrame> frames() => controller.stream;
-
-  Future<void> close() => controller.close();
-}
+import '../../helpers/controlled_pose_source.dart';
 
 class _RecordingPlayer implements CuePlayer {
   final spoken = <String>[];
@@ -32,7 +21,7 @@ class _RecordingPlayer implements CuePlayer {
 }
 
 void main() {
-  late _ControlledSource source;
+  late ControlledPoseSource source;
   late _RecordingPlayer player;
   late ProviderContainer container;
 
@@ -41,7 +30,7 @@ void main() {
   CoachState state() => container.read(coachControllerProvider('squat'));
 
   setUp(() {
-    source = _ControlledSource();
+    source = ControlledPoseSource();
     player = _RecordingPlayer();
     container = ProviderContainer(
       overrides: [
