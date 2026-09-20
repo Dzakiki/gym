@@ -260,6 +260,47 @@ void main() {
     });
   });
 
+  group('history', () {
+    test('lists finished workouts newest first with their totals', () async {
+      final first = await repo.startWorkout(routineId: pushDayId);
+      final firstSet = (await load(first)).exercises.first.sets.first;
+      await repo.updateSetWeight(firstSet.id, 50);
+      await repo.setCompleted(firstSet.id, completed: true);
+      now = DateTime.utc(2026, 9, 20, 10, 30);
+      await repo.finishWorkout(first);
+
+      now = DateTime.utc(2026, 9, 21, 9);
+      final second = await repo.startWorkout();
+      await repo.addExercise(second, plankId);
+      final plankSet = (await load(second)).exercises.single.sets.single;
+      await repo.setCompleted(plankSet.id, completed: true);
+      now = DateTime.utc(2026, 9, 21, 9, 20);
+      await repo.finishWorkout(second);
+
+      final history = await repo.watchHistory().first;
+
+      expect(history.map((e) => e.session.id), [second, first]);
+      expect(history.first.completedSets, 1);
+      expect(history.first.volumeKg, 0);
+      expect(history.first.duration, const Duration(minutes: 20));
+      expect(history.last.completedSets, 1);
+      expect(history.last.volumeKg, 8 * 50);
+    });
+
+    test('leaves out unfinished, discarded and deleted workouts', () async {
+      final active = await repo.startWorkout(routineId: pushDayId);
+      expect(await repo.watchHistory().first, isEmpty);
+
+      final setId = (await load(active)).exercises.first.sets.first.id;
+      await repo.setCompleted(setId, completed: true);
+      await repo.finishWorkout(active);
+      expect(await repo.watchHistory().first, hasLength(1));
+
+      await repo.discardWorkout(active);
+      expect(await repo.watchHistory().first, isEmpty);
+    });
+  });
+
   test('watchWorkout emits again after a change', () async {
     final id = await repo.startWorkout(routineId: pushDayId);
     final setId = (await load(id)).exercises.first.sets.first.id;

@@ -6,6 +6,8 @@ abstract final class AppRoutes {
   static const routines = '/workouts/routines';
   static const newRoutine = '/workouts/routines/new';
 
+  static String historyDetail(String id) => '/progress/workouts/$id';
+
   static String workout(String id) => '/workout/$id';
 
   static String exerciseDetail(String id) => '$exerciseLibrary/$id';

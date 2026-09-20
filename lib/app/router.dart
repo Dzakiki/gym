@@ -4,6 +4,7 @@ import 'package:formcoach/app/app_tab.dart';
 import 'package:formcoach/features/coach/coach_screen.dart';
 import 'package:formcoach/features/exercises/exercise_detail_screen.dart';
 import 'package:formcoach/features/exercises/exercise_library_screen.dart';
+import 'package:formcoach/features/history/workout_detail_screen.dart';
 import 'package:formcoach/features/home/home_screen.dart';
 import 'package:formcoach/features/profile/profile_screen.dart';
 import 'package:formcoach/features/progress/progress_screen.dart';
@@ -56,6 +57,13 @@ List<RouteBase> _subRoutesFor(AppTab tab) => switch (tab) {
       path: 'routines/:id/edit',
       builder: (context, state) =>
           RoutineBuilderScreen(routineId: state.pathParameters['id']),
+    ),
+  ],
+  AppTab.progress => [
+    GoRoute(
+      path: 'workouts/:id',
+      builder: (context, state) =>
+          WorkoutDetailScreen(workoutId: state.pathParameters['id']!),
     ),
   ],
   _ => const [],
