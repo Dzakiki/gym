@@ -22,12 +22,18 @@ class RoutineDetailScreen extends ConsumerWidget {
       appBar: AppBar(
         title: Text(value?.routine.name ?? 'Routine'),
         actions: [
-          if (value != null && !value.routine.isTemplate)
+          if (value != null && !value.routine.isTemplate) ...[
+            IconButton(
+              icon: const Icon(Icons.edit_outlined),
+              tooltip: 'Edit routine',
+              onPressed: () => context.push(AppRoutes.editRoutine(routineId)),
+            ),
             IconButton(
               icon: const Icon(Icons.delete_outline),
               tooltip: 'Delete routine',
               onPressed: () => _confirmDelete(context, ref),
             ),
+          ],
         ],
       ),
       body: detail.when(
