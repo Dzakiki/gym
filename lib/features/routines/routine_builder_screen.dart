@@ -38,6 +38,10 @@ class _RoutineBuilderScreenState extends ConsumerState<RoutineBuilderScreen> {
   bool _notFound = false;
   bool _saving = false;
 
+  /// What the routine looked like when the screen opened, to tell whether the
+  /// user changed anything.
+  String? _baseline;
+
   bool get _isEditing => widget.routineId != null;
 
   @override
@@ -46,6 +50,8 @@ class _RoutineBuilderScreenState extends ConsumerState<RoutineBuilderScreen> {
     if (_isEditing) {
       _loading = true;
       _load(widget.routineId!);
+    } else {
+      _baseline = _signature();
     }
   }
 
@@ -83,7 +89,42 @@ class _RoutineBuilderScreenState extends ConsumerState<RoutineBuilderScreen> {
           ),
         ),
       );
+      _baseline = _signature();
     });
+  }
+
+  /// A summary of everything the user can edit, for detecting changes.
+  String _signature() => [
+    _nameController.text.trim(),
+    _descriptionController.text.trim(),
+    (_days.toList()..sort()).join(','),
+    for (final entry in _entries)
+      '${entry.item.exerciseId}:${entry.item.targetSets}:'
+          '${entry.item.targetReps}:${entry.item.targetSeconds}:'
+          '${entry.item.restSeconds}',
+  ].join('|');
+
+  bool get _hasUnsavedChanges => _baseline != null && _signature() != _baseline;
+
+  Future<void> _confirmDiscard() async {
+    final discard = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Discard changes?'),
+        content: const Text('Your changes to this routine will be lost.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Keep editing'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Discard'),
+          ),
+        ],
+      ),
+    );
+    if (discard == true && mounted) context.pop();
   }
 
   RoutineDraft get _draft => RoutineDraft(
@@ -131,6 +172,16 @@ class _RoutineBuilderScreenState extends ConsumerState<RoutineBuilderScreen> {
   @override
   Widget build(BuildContext context) {
     final error = _draft.validationError;
+    return PopScope(
+      canPop: !_hasUnsavedChanges,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop) _confirmDiscard();
+      },
+      child: _scaffold(error),
+    );
+  }
+
+  Widget _scaffold(String? error) {
     return Scaffold(
       appBar: AppBar(
         title: Text(_isEditing ? 'Edit routine' : 'New routine'),

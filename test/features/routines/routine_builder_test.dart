@@ -121,4 +121,115 @@ void main() {
 
     expect(find.text('My push day'), findsWidgets);
   });
+  group('leaving with unsaved changes', () {
+    appTest('an untouched new routine can be left without a prompt', (
+      tester,
+      db,
+    ) async {
+      await _openNewRoutine(tester);
+
+      await tester.pageBack();
+      await settle(tester);
+
+      expect(find.text('Discard changes?'), findsNothing);
+      expect(find.text('New routine'), findsNothing);
+    });
+
+    appTest('leaving after typing asks first and can keep editing', (
+      tester,
+      db,
+    ) async {
+      await _openNewRoutine(tester);
+      await tester.enterText(find.byType(TextField).first, 'Morning');
+      await tester.pump();
+
+      await tester.pageBack();
+      await settle(tester);
+      expect(find.text('Discard changes?'), findsOneWidget);
+
+      await tester.tap(find.text('Keep editing'));
+      await settle(tester);
+      expect(find.text('New routine'), findsWidgets);
+      expect(find.text('Discard changes?'), findsNothing);
+    });
+
+    appTest('discarding leaves without saving', (tester, db) async {
+      await _openNewRoutine(tester);
+      await tester.enterText(find.byType(TextField).first, 'Morning');
+      await tester.pump();
+
+      await tester.pageBack();
+      await settle(tester);
+      await tester.tap(find.widgetWithText(FilledButton, 'Discard'));
+      await settle(tester);
+
+      expect(find.text('Discard changes?'), findsNothing);
+      expect(find.text('New routine'), findsNothing);
+      expect(find.text('Morning'), findsNothing);
+    });
+
+    appTest('saving leaves without a prompt', (tester, db) async {
+      await _openNewRoutine(tester);
+      await tester.enterText(find.byType(TextField).first, 'Morning');
+      await _addExercise(tester, 'Squat');
+
+      await tester.tap(_saveButton);
+      await settle(tester);
+
+      expect(find.text('Discard changes?'), findsNothing);
+      expect(find.text('Morning'), findsOneWidget);
+    });
+
+    appTest('editing an existing routine without changes needs no prompt', (
+      tester,
+      db,
+    ) async {
+      await openWorkoutsTab(tester);
+      await tester.tap(find.text('Push day'));
+      await settle(tester);
+      await tester.tap(find.text('Copy to my routines'));
+      await settle(tester);
+      await tester.tap(find.byTooltip('Edit routine'));
+      await settle(tester);
+
+      await tester.pageBack();
+      await settle(tester);
+
+      expect(find.text('Discard changes?'), findsNothing);
+      expect(find.text('Edit routine'), findsNothing);
+    });
+
+    appTest('changing an existing routine asks before leaving', (
+      tester,
+      db,
+    ) async {
+      await openWorkoutsTab(tester);
+      await tester.tap(find.text('Push day'));
+      await settle(tester);
+      await tester.tap(find.text('Copy to my routines'));
+      await settle(tester);
+      await tester.tap(find.byTooltip('Edit routine'));
+      await settle(tester);
+      await tester.enterText(find.byType(TextField).first, 'Renamed');
+      await tester.pump();
+
+      await tester.pageBack();
+      await settle(tester);
+
+      expect(find.text('Discard changes?'), findsOneWidget);
+    });
+
+    appTest('undoing a change removes the prompt', (tester, db) async {
+      await _openNewRoutine(tester);
+      await tester.enterText(find.byType(TextField).first, 'Morning');
+      await tester.pump();
+      await tester.enterText(find.byType(TextField).first, '');
+      await tester.pump();
+
+      await tester.pageBack();
+      await settle(tester);
+
+      expect(find.text('Discard changes?'), findsNothing);
+    });
+  });
 }
