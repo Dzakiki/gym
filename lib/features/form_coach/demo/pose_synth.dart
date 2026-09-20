@@ -15,19 +15,21 @@ const _torso = 0.30;
 /// The ankle is fixed to the floor. [kneeAngle] is the angle between shin and
 /// thigh (180 is straight), [shinLean] is how far the shin tilts forward from
 /// vertical and [torsoLean] how far the torso tilts forward from vertical. The
-/// person faces right unless [facingRight] is false. Both body sides get the
+/// person faces right unless [facingRight] is false. [heelLift] raises the
+/// heel off the floor (image-height units). Both body sides get the
 /// same landmarks.
 Map<Landmark, LandmarkPoint> squatPose({
   required double kneeAngle,
   required double torsoLean,
   required double shinLean,
+  double heelLift = 0,
   bool facingRight = true,
   double likelihood = 1,
 }) {
   final direction = facingRight ? 1.0 : -1.0;
   const ankle = Vec2(0.5, 0.9);
   final toe = Vec2(ankle.x + 0.08 * direction, ankle.y);
-  final heel = Vec2(ankle.x - 0.03 * direction, ankle.y);
+  final heel = Vec2(ankle.x - 0.03 * direction, ankle.y + 0.01 - heelLift);
 
   final shinRad = shinLean * _degToRad;
   final knee = Vec2(
@@ -78,6 +80,7 @@ class SquatMotion {
     this.bottomKnee = 70,
     this.torsoLeanAtBottom = 25,
     this.shinLeanAtBottom = 25,
+    this.heelLiftAtBottom = 0,
     this.down = const Duration(milliseconds: 1500),
     this.up = const Duration(milliseconds: 1500),
     this.rest = const Duration(milliseconds: 800),
@@ -90,6 +93,9 @@ class SquatMotion {
   final double bottomKnee;
   final double torsoLeanAtBottom;
   final double shinLeanAtBottom;
+
+  /// How far the heel is lifted off the floor at the bottom.
+  final double heelLiftAtBottom;
 
   /// Time going down and coming up.
   final Duration down;
@@ -173,6 +179,7 @@ List<PoseFrame> squatFrames(
       kneeAngle: motion.topKnee + (motion.bottomKnee - motion.topKnee) * depth,
       torsoLean: 5 + (motion.torsoLeanAtBottom - 5) * depth,
       shinLean: 5 + (motion.shinLeanAtBottom - 5) * depth,
+      heelLift: motion.heelLiftAtBottom * depth,
       facingRight: motion.facingRight,
     ),
     reps: motion.reps,

@@ -10,6 +10,7 @@ RepSummary _rep({
   double hipDrop = 0,
   double torsoLean = 20,
   double kneeOverToe = 0.05,
+  double heelLift = -0.03,
   Duration descent = const Duration(milliseconds: 1500),
 }) {
   MetricStats fixed(double value) =>
@@ -20,6 +21,7 @@ RepSummary _rep({
       SquatMetric.torsoLean: fixed(torsoLean),
       SquatMetric.kneeOverToe: fixed(kneeOverToe),
       SquatMetric.kneeAngle: fixed(70),
+      SquatMetric.heelLift: fixed(heelLift),
     },
     descent: descent,
     ascent: const Duration(milliseconds: 1500),
@@ -83,6 +85,38 @@ void main() {
       expect(forward[SquatMetric.kneeOverToe]!, greaterThan(0.35));
     });
 
+    test('the heel rises above the toes when the heel is lifted', () {
+      final flat = measureSquat(frame(), BodySide.left)!;
+      final lifted = PoseFrame(
+        timestamp: Duration.zero,
+        points: squatPose(
+          kneeAngle: 70,
+          torsoLean: 25,
+          shinLean: 25,
+          heelLift: 0.06,
+        ),
+      );
+
+      expect(flat[SquatMetric.heelLift]!, lessThan(0));
+      expect(
+        measureSquat(lifted, BodySide.left)![SquatMetric.heelLift]!,
+        greaterThan(SquatLimits.maxHeelLift),
+      );
+    });
+
+    test('a missing heel does not stop the frame being measured', () {
+      final points = squatPose(kneeAngle: 70, torsoLean: 25, shinLean: 25)
+        ..remove(Landmark.leftHeel);
+
+      final metrics = measureSquat(
+        PoseFrame(timestamp: Duration.zero, points: points),
+        BodySide.left,
+      );
+
+      expect(metrics, isNotNull);
+      expect(metrics![SquatMetric.heelLift], 0);
+    });
+
     test('returns null when a needed landmark is missing', () {
       final points = squatPose(kneeAngle: 90, torsoLean: 20, shinLean: 20)
         ..remove(Landmark.leftKnee);
@@ -130,6 +164,16 @@ void main() {
       );
     });
 
+    test('heels: only a heel clearly above the toes counts as lifting', () {
+      expect(_severity('squat_heel_lift', _rep(heelLift: 0.05)), 0);
+      expect(_severity('squat_heel_lift', _rep(heelLift: -0.1)), 0);
+      expect(
+        _severity('squat_heel_lift', _rep(heelLift: 0.10)),
+        closeTo(0.5, 1e-9),
+      );
+      expect(_severity('squat_heel_lift', _rep(heelLift: 0.4)), 1);
+    });
+
     test('tempo: going down in under 0.8 s is too fast', () {
       const ms = Duration(milliseconds: 1);
       expect(_severity('squat_tempo', _rep(descent: ms * 800)), 0);
@@ -147,6 +191,7 @@ void main() {
           'squat_depth': 'Go deeper',
           'squat_torso_lean': 'Chest up',
           'squat_knee_forward': 'Sit back into your hips',
+          'squat_heel_lift': 'Keep heels down',
           'squat_tempo': 'Slow down on the way down',
         },
       );

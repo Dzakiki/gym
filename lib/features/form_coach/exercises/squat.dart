@@ -21,6 +21,10 @@ abstract final class SquatMetric {
   /// How far the knee is past the toes, in torso lengths. Negative means the
   /// knee is behind the toes.
   static const kneeOverToe = 'knee_over_toe';
+
+  /// How far the heel is above the toes, in torso lengths. Negative or zero
+  /// when the heel is on the floor; positive when it has lifted.
+  static const heelLift = 'heel_lift';
 }
 
 /// Limits used by the squat rules. They are starting values to be tuned with
@@ -36,6 +40,10 @@ abstract final class SquatLimits {
   /// The knees may go this far past the toes (in torso lengths).
   static const maxKneeOverToe = 0.35;
 
+  /// The heel may rise this far above the toes (torso lengths) before it
+  /// counts as lifting off the floor.
+  static const maxHeelLift = 0.05;
+
   /// Going down faster than this is too fast to stay in control.
   static const minDescent = Duration(milliseconds: 800);
 }
@@ -48,6 +56,7 @@ Metrics? measureSquat(PoseFrame frame, BodySide side) {
   final knee = frame.position(side.knee);
   final ankle = frame.position(side.ankle);
   final toe = frame.position(side.toe);
+  final heel = frame.position(side.heel);
   if (shoulder == null ||
       hip == null ||
       knee == null ||
@@ -66,6 +75,8 @@ Metrics? measureSquat(PoseFrame frame, BodySide side) {
     SquatMetric.torsoLean: leanFromVertical(hip, shoulder),
     SquatMetric.hipDrop: (hip.y - knee.y) / torsoLength,
     SquatMetric.kneeOverToe: (knee.x - toe.x) * facing / torsoLength,
+    // The heel is optional: without it the check simply cannot fire.
+    SquatMetric.heelLift: heel == null ? 0 : (toe.y - heel.y) / torsoLength,
   };
 }
 
@@ -110,6 +121,16 @@ final squat = ExerciseDefinition(
         rep.stat(SquatMetric.kneeOverToe).max,
         from: SquatLimits.maxKneeOverToe,
         range: 0.35,
+      ),
+    ),
+    FormRule(
+      code: 'squat_heel_lift',
+      cue: 'Keep heels down',
+      weight: 15,
+      check: (rep) => _scale(
+        rep.stat(SquatMetric.heelLift).max,
+        from: SquatLimits.maxHeelLift,
+        range: 0.1,
       ),
     ),
     FormRule(
