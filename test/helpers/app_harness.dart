@@ -73,3 +73,13 @@ Future<void> openWorkoutsTab(WidgetTester tester) async {
   );
   await tester.pumpAndSettle();
 }
+
+/// Lets pending database work and animations finish.
+///
+/// `pumpAndSettle` alone returns immediately when no frame is scheduled, even
+/// while the app is still waiting for a database future.
+Future<void> settle(WidgetTester tester) async {
+  await tester.pump();
+  await tester.pump(const Duration(milliseconds: 100));
+  await tester.pumpAndSettle();
+}

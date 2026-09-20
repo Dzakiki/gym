@@ -1,9 +1,12 @@
 /// Route paths used for navigation outside the router definition.
 abstract final class AppRoutes {
+  static const workouts = '/workouts';
   static const exerciseLibrary = '/workouts/exercises';
   static const pickExercise = '/workouts/pick-exercise';
   static const routines = '/workouts/routines';
   static const newRoutine = '/workouts/routines/new';
+
+  static String workout(String id) => '/workout/$id';
 
   static String exerciseDetail(String id) => '$exerciseLibrary/$id';
 

@@ -62,19 +62,26 @@ class WorkoutRepository {
   static const defaultRestSeconds = 90;
   static const maxReps = 1000;
   static const maxWeightKg = 1000.0;
+  static const maxDurationSeconds = 3600;
 
   final AppDatabase _database;
   final Clock _clock;
   final IdGenerator _newId;
 
-  /// The workout in progress, or null. Emits again when it changes.
-  Stream<WorkoutSession?> watchActiveSession() {
-    final query = _database.select(_database.workoutSessions)
+  SimpleSelectStatement<$WorkoutSessionsTable, WorkoutSession> _activeQuery() {
+    return _database.select(_database.workoutSessions)
       ..where((s) => s.endedAt.isNull() & s.deletedAt.isNull())
       ..orderBy([(s) => OrderingTerm.desc(s.startedAt)])
       ..limit(1);
-    return query.watchSingleOrNull();
   }
+
+  /// The workout in progress, or null. Emits again when it changes.
+  Stream<WorkoutSession?> watchActiveSession() =>
+      _activeQuery().watchSingleOrNull();
+
+  /// The workout in progress right now, or null.
+  Future<WorkoutSession?> getActiveSession() =>
+      _activeQuery().getSingleOrNull();
 
   /// The workout with [id] and its sets, or null if it does not exist.
   Stream<ActiveWorkout?> watchWorkout(String id) => watchLoad(
@@ -145,7 +152,7 @@ class WorkoutRepository {
   /// does not exist.
   Future<String> startWorkout({String? routineId}) {
     return _database.transaction(() async {
-      final active = await watchActiveSession().first;
+      final active = await getActiveSession();
       if (active != null) throw StateError('A workout is already in progress.');
 
       final now = _clock();
@@ -308,6 +315,19 @@ class WorkoutRepository {
       throw ArgumentError.value(weightKg, 'weightKg', 'must be 0-$maxWeightKg');
     }
     return _updateSet(setId, SetLogsCompanion(weightKg: Value(weightKg)));
+  }
+
+  /// Sets the duration of a timed set in seconds. Pass null to clear. Throws
+  /// [ArgumentError] if the value is negative or above [maxDurationSeconds].
+  Future<void> updateSetDuration(String setId, int? seconds) {
+    if (seconds != null && (seconds < 0 || seconds > maxDurationSeconds)) {
+      throw ArgumentError.value(
+        seconds,
+        'seconds',
+        'must be 0-$maxDurationSeconds',
+      );
+    }
+    return _updateSet(setId, SetLogsCompanion(durationSeconds: Value(seconds)));
   }
 
   /// Marks a set as done or not done.

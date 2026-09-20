@@ -6,6 +6,7 @@ import 'package:formcoach/data/providers.dart';
 import 'package:formcoach/data/repositories/routine_repository.dart';
 import 'package:formcoach/features/routines/routine_formatting.dart';
 import 'package:formcoach/features/routines/routine_providers.dart';
+import 'package:formcoach/features/workout/start_workout.dart';
 import 'package:go_router/go_router.dart';
 
 /// Shows a routine or template with its exercises and targets.
@@ -118,18 +119,28 @@ class _RoutineBody extends ConsumerWidget {
             ],
           ),
         ),
-        if (routine.isTemplate)
-          SafeArea(
-            minimum: const EdgeInsets.all(16),
-            child: SizedBox(
-              width: double.infinity,
-              child: FilledButton.icon(
-                icon: const Icon(Icons.copy),
-                label: const Text('Copy to my routines'),
-                onPressed: () => _copy(context, ref),
+        SafeArea(
+          minimum: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              FilledButton.icon(
+                icon: const Icon(Icons.play_arrow),
+                label: const Text('Start workout'),
+                onPressed: () =>
+                    startWorkout(context, ref, routineId: routine.id),
               ),
-            ),
+              if (routine.isTemplate) ...[
+                const SizedBox(height: 8),
+                OutlinedButton.icon(
+                  icon: const Icon(Icons.copy),
+                  label: const Text('Copy to my routines'),
+                  onPressed: () => _copy(context, ref),
+                ),
+              ],
+            ],
           ),
+        ),
       ],
     );
   }
