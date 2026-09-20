@@ -103,11 +103,20 @@ class SquatMotion {
   final double noise;
 }
 
-/// Generates the camera frames of a set of squats at [fps] frames per second.
-///
-/// Every rep starts with a rest at the top, then eases down and back up.
-List<PoseFrame> squatFrames(
-  SquatMotion motion, {
+/// Builds the skeleton for a movement [depth]: 0 at the start position, 1 at
+/// the bottom (or the top of a pull), with values in between while moving.
+typedef PoseBuilder = Map<Landmark, LandmarkPoint> Function(double depth);
+
+/// Generates the camera frames of a set of repetitions at [fps] frames per
+/// second: a rest, then [reps] times a move to depth 1 and back, each followed
+/// by a rest. Movement is eased so speed is zero at both ends.
+List<PoseFrame> repetitionFrames(
+  PoseBuilder poseAt, {
+  required int reps,
+  required Duration down,
+  required Duration up,
+  required Duration rest,
+  double noise = 0,
   int fps = 30,
   Duration start = Duration.zero,
 }) {
@@ -116,20 +125,11 @@ List<PoseFrame> squatFrames(
   final step = Duration(microseconds: Duration.microsecondsPerSecond ~/ fps);
 
   void add(double depth) {
-    // depth: 0 standing, 1 at the bottom.
-    final knee = motion.topKnee + (motion.bottomKnee - motion.topKnee) * depth;
-    final points = squatPose(
-      kneeAngle: knee,
-      torsoLean: 5 + (motion.torsoLeanAtBottom - 5) * depth,
-      shinLean: 5 + (motion.shinLeanAtBottom - 5) * depth,
-      facingRight: motion.facingRight,
-    );
+    final points = poseAt(depth);
     frames.add(
       PoseFrame(
         timestamp: start + time,
-        points: motion.noise == 0
-            ? points
-            : _jitter(points, frames.length, motion.noise),
+        points: noise == 0 ? points : _jitter(points, frames.length, noise),
       ),
     );
     time += step;
@@ -153,13 +153,36 @@ List<PoseFrame> squatFrames(
     }
   }
 
-  hold(motion.rest);
-  for (var rep = 0; rep < motion.reps; rep++) {
-    move(motion.down, downwards: true);
-    move(motion.up, downwards: false);
-    hold(motion.rest);
+  hold(rest);
+  for (var rep = 0; rep < reps; rep++) {
+    move(down, downwards: true);
+    move(up, downwards: false);
+    hold(rest);
   }
   return frames;
+}
+
+/// Generates the camera frames of a set of squats at [fps] frames per second.
+List<PoseFrame> squatFrames(
+  SquatMotion motion, {
+  int fps = 30,
+  Duration start = Duration.zero,
+}) {
+  return repetitionFrames(
+    (depth) => squatPose(
+      kneeAngle: motion.topKnee + (motion.bottomKnee - motion.topKnee) * depth,
+      torsoLean: 5 + (motion.torsoLeanAtBottom - 5) * depth,
+      shinLean: 5 + (motion.shinLeanAtBottom - 5) * depth,
+      facingRight: motion.facingRight,
+    ),
+    reps: motion.reps,
+    down: motion.down,
+    up: motion.up,
+    rest: motion.rest,
+    noise: motion.noise,
+    fps: fps,
+    start: start,
+  );
 }
 
 Map<Landmark, LandmarkPoint> _jitter(
