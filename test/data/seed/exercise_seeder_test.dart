@@ -3,20 +3,12 @@ import 'dart:io';
 
 import 'package:drift/drift.dart' hide isNull;
 import 'package:drift/native.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:formcoach/data/local/app_database.dart';
 import 'package:formcoach/data/seed/exercise_seeder.dart';
 import 'package:formcoach/domain/enums.dart';
 
-/// Serves the real seed file from disk so tests validate the shipped asset.
-class _FileAssetBundle extends CachingAssetBundle {
-  @override
-  Future<ByteData> load(String key) async {
-    final bytes = await File(key).readAsBytes();
-    return ByteData.view(bytes.buffer);
-  }
-}
+import '../../helpers/file_asset_bundle.dart';
 
 void main() {
   late AppDatabase db;
@@ -26,7 +18,7 @@ void main() {
     db = AppDatabase(NativeDatabase.memory());
     seeder = ExerciseSeeder(
       database: db,
-      assetBundle: _FileAssetBundle(),
+      assetBundle: FileAssetBundle(),
       clock: () => DateTime.utc(2026, 9, 20),
     );
   });
