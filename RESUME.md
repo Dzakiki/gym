@@ -34,7 +34,8 @@ Read this first, then `IMPLEMENTATION_PLAN.md` for the full design.
 | Custom exercises (create in the library, delete your own) | Merged (PR #28) |
 | Routine builder asks before discarding unsaved changes | Merged (PR #29) |
 | Spoken coach cues (`flutter_tts`, follows the Profile switch) | Merged (PR #30) |
-| Squat heel-lift rule | In the latest PR (see `git log`) |
+| Squat heel-lift rule | Merged (PR #31) |
+| App name (FormCoach) and a placeholder launcher icon | In the latest PR (see `git log`) |
 
 `main` is protected: PR required, checks `analyze-test` and `android-build` must pass, squash-merge only.
 
@@ -100,6 +101,8 @@ Commit messages end with `Co-Authored-By: Claude Sonnet 5 <noreply@anthropic.com
 - The database is at schema version 2. Any table added later needs an `onUpgrade` step in `AppDatabase.migration` (see the v2 one) and a test like `test/data/local/migration_test.dart`.
 
 - `coachEngineVersion` (in `coach_result.dart`) is stored with every saved analysis; bump it whenever a rule or threshold changes in a way that alters scores (it is 2 since the squat heel-lift rule).
+
+- The launcher icon is a placeholder drawn in code (`assets/icon/`). To change it, replace `icon.png` (1024x1024, full square) and `icon_foreground.png` (transparent, artwork inside the centre 66%), then run `dart run flutter_launcher_icons` and commit the generated files. The generator config is the `flutter_launcher_icons` block at the end of `pubspec.yaml`.
 
 ## Gotchas
 
