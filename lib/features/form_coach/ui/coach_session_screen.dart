@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:formcoach/core/widgets/empty_state.dart';
+import 'package:formcoach/data/providers.dart';
 import 'package:formcoach/features/form_coach/coach_controller.dart';
+import 'package:formcoach/features/form_coach/coach_result_builder.dart';
 import 'package:formcoach/features/form_coach/engine/cue_manager.dart';
 import 'package:formcoach/features/form_coach/engine/rep_scorer.dart';
 import 'package:formcoach/features/form_coach/exercises/registry.dart';
@@ -13,9 +15,12 @@ import 'package:go_router/go_router.dart';
 /// Coaches one set: shows the body, counts reps, gives cues and, at the end,
 /// the results.
 class CoachSessionScreen extends ConsumerWidget {
-  const CoachSessionScreen({required this.coachKey, super.key});
+  const CoachSessionScreen({required this.coachKey, this.setLogId, super.key});
 
   final String coachKey;
+
+  /// The set of the workout in progress to save the results into, if any.
+  final String? setLogId;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -31,6 +36,14 @@ class CoachSessionScreen extends ConsumerWidget {
     }
 
     final state = ref.watch(coachControllerProvider(coachKey));
+    void save(bool isHold) => _saveResults(
+      context,
+      ref,
+      coachKey: coachKey,
+      setLogId: setLogId!,
+      isHold: isHold,
+      state: state,
+    );
     final controller = ref.read(coachControllerProvider(coachKey).notifier);
     return Scaffold(
       appBar: AppBar(title: Text(definition.name)),
@@ -55,7 +68,11 @@ class CoachSessionScreen extends ConsumerWidget {
             ),
           Padding(
             padding: const EdgeInsets.all(16),
-            child: _Controls(state: state, controller: controller),
+            child: _Controls(
+              state: state,
+              controller: controller,
+              onSave: setLogId == null ? null : () => save(definition.isHold),
+            ),
           ),
         ],
       ),
@@ -63,11 +80,42 @@ class CoachSessionScreen extends ConsumerWidget {
   }
 }
 
+Future<void> _saveResults(
+  BuildContext context,
+  WidgetRef ref, {
+  required String coachKey,
+  required String setLogId,
+  required bool isHold,
+  required CoachState state,
+}) async {
+  final router = GoRouter.of(context);
+  final messenger = ScaffoldMessenger.of(context);
+  await ref
+      .read(coachRepositoryProvider)
+      .saveCoachedSet(
+        setLogId: setLogId,
+        exerciseKey: coachKey,
+        result: coachResultFromState(state, isHold: isHold),
+      );
+  messenger.showSnackBar(
+    const SnackBar(content: Text('Saved to your workout')),
+  );
+  router.pop();
+}
+
 class _Controls extends StatelessWidget {
-  const _Controls({required this.state, required this.controller});
+  const _Controls({
+    required this.state,
+    required this.controller,
+    required this.onSave,
+  });
 
   final CoachState state;
   final CoachController controller;
+
+  /// Saves the results into the workout. Null when there is nothing to save
+  /// them into.
+  final VoidCallback? onSave;
 
   @override
   Widget build(BuildContext context) {
@@ -85,20 +133,36 @@ class _Controls extends StatelessWidget {
           onPressed: controller.stop,
         );
       case CoachStatus.finished:
-        return Row(
+        final canSave =
+            onSave != null &&
+            (state.repCount > 0 || state.holdTime > Duration.zero);
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Expanded(
-              child: OutlinedButton(
-                onPressed: () => context.pop(),
-                child: const Text('Done'),
+            if (canSave) ...[
+              FilledButton.icon(
+                icon: const Icon(Icons.save_outlined),
+                label: const Text('Save to workout'),
+                onPressed: onSave,
               ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: FilledButton(
-                onPressed: controller.start,
-                child: const Text('Again'),
-              ),
+              const SizedBox(height: 12),
+            ],
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => context.pop(),
+                    child: const Text('Done'),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: controller.start,
+                    child: const Text('Again'),
+                  ),
+                ),
+              ],
             ),
           ],
         );

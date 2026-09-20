@@ -6,7 +6,12 @@ abstract final class AppRoutes {
   static const routines = '/workouts/routines';
   static const newRoutine = '/workouts/routines/new';
 
-  static String coachSession(String coachKey) => '/coach-session/$coachKey';
+  /// The coach screen for [coachKey]. With [setLogId] the results can be saved
+  /// into that set of the workout in progress.
+  static String coachSession(String coachKey, {String? setLogId}) {
+    final path = '/coach-session/$coachKey';
+    return setLogId == null ? path : '$path?set=$setLogId';
+  }
 
   static String historyDetail(String id) => '/progress/workouts/$id';
 
