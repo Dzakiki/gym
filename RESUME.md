@@ -20,7 +20,7 @@ Read this first, then `IMPLEMENTATION_PLAN.md` for the full design.
 | Form Coach: `FormRule`, `RepScorer`, `CueManager` | Merged (PR #12) |
 | Form Coach: `CoachSession`, `ExerciseDefinition`, squat, synthetic pose generator | Merged (PR #13) |
 | Form Coach: `CoachController`, `PoseSource`/`ReplayPoseSource`, `CuePlayer`, exercise registry | Merged (PR #14) |
-| Form Coach screen: skeleton overlay, live counter, score chip, cue banner, set summary, Coach tab (demo source) | In the latest PR (see `git log`) |
+| Form Coach screen: skeleton overlay, live counter, score chip, cue banner, set summary, Coach tab (demo source) | Merged (PR #15) |
 
 `main` is protected: PR required, checks `analyze-test` and `android-build` must pass, squash-merge only.
 
@@ -40,6 +40,15 @@ Workout tracking leftovers:
 2. `feat/p1-settings-units`: kg/lb setting (weights are stored in kg), custom exercise creation UI (the repository already supports it), unsaved-changes prompt in the routine builder.
 3. Tag `v0.1.0` (bump `pubspec.yaml` version in a PR, then `git tag v0.1.0 && git push --tags`).
 4. Phase 2 (camera + pose spike) **needs the Android phone plugged in with USB debugging on**.
+
+## Try the app on your phone
+
+The app has never been run on a real device yet (only tests and CI builds). To try it:
+
+1. Easiest: open the latest green run on GitHub (Actions tab), download the `app-debug-apk` artifact, unzip it, and install `app-debug.apk` on the phone (allow installs from unknown sources).
+2. Or plug the phone in (USB debugging on), then `flutter devices` and `flutter run` in `C:\Users\AhmadDzaki\gym-app`.
+
+The Coach tab runs on a **simulated person** (demo source), not the camera. Check that the app starts, seeds the library, and that a full workout and a demo coach set work. Report anything odd; real-device problems (database, fonts, permissions) are the most likely surprises.
 
 ## How to work
 
