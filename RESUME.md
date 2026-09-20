@@ -24,7 +24,8 @@ Read this first, then `IMPLEMENTATION_PLAN.md` for the full design.
 | Coach exercise: push-up | Merged (PR #17) |
 | Coach exercise: plank (hold mode) | Merged (PR #18) |
 | Coach exercise: dips (parallel bars or two chairs) | Merged (PR #19) |
-| Coach exercise: pull-up | In the latest PR (see `git log`) |
+| Coach exercise: pull-up | Merged (PR #20) |
+| Coach exercise: lunge | In the latest PR (see `git log`) |
 
 `main` is protected: PR required, checks `analyze-test` and `android-build` must pass, squash-merge only.
 
@@ -33,7 +34,7 @@ Read this first, then `IMPLEMENTATION_PLAN.md` for the full design.
 Form Coach engine (pure Dart, no phone needed; build in this order, test with synthetic pose sequences):
 
 - The squat is the template: see `lib/features/form_coach/exercises/squat.dart` (metrics, limits, rules) and `lib/features/form_coach/demo/pose_synth.dart` (generates squat frames from joint angles; extend it with push-up, lunge, plank and jumping-jack poses).
-- **Agreed with the user (2026-09-20): coach all bodyweight exercises they film at home, one exercise per PR, easiest first:** push-up (done), plank (done: hold mode via `ExerciseDefinition.hold` and `HoldSpec`, see `exercises/plank.dart`), dips (done, `exercises/dip.dart`), pull-up (done, `exercises/pullup.dart`: nose above wrist height stands in for chin over bar), lunge, jumping jack (front view). Each needs: a synthetic pose generator in `lib/features/form_coach/demo/` (use `repetitionFrames`), a definition in `exercises/`, an entry in `exercises/registry.dart`, the exercise's `coachKey` in `assets/seed/exercises.json` (the seed test now requires the seed's coach keys to equal the registry's keys, so add the key to the seed in the same PR as the registry entry; lunge and jumping jack currently have no key), and tests. Squat heel-lift rule is still missing (needs a heel baseline).
+- **Agreed with the user (2026-09-20): coach all bodyweight exercises they film at home, one exercise per PR, easiest first:** push-up (done), plank (done: hold mode via `ExerciseDefinition.hold` and `HoldSpec`, see `exercises/plank.dart`), dips (done, `exercises/dip.dart`), pull-up (done, `exercises/pullup.dart`: nose above wrist height stands in for chin over bar), lunge (done, `exercises/lunge.dart`: a static lunge or split squat; walking lunges are not handled), jumping jack (front view). Each needs: a synthetic pose generator in `lib/features/form_coach/demo/` (use `repetitionFrames`), a definition in `exercises/`, an entry in `exercises/registry.dart`, the exercise's `coachKey` in `assets/seed/exercises.json` (the seed test now requires the seed's coach keys to equal the registry's keys, so add the key to the seed in the same PR as the registry entry; lunge and jumping jack currently have no key), and tests. Squat heel-lift rule is still missing (needs a heel baseline).
 - Save a coached set into the workout: a `coach_analyses` table (schema in section 6 of the plan), a "Start with AI Coach" button on coach-supported exercises in the active workout that fills reps and marks the set `coached`, and a form-score trend on the Progress tab.
 - TTS: implement `CuePlayer` with `flutter_tts` and override `cuePlayerProvider` (needs a real device to check).
 - Camera pipeline (needs the phone): `camera` image stream, ML Kit detector implementing a `PoseSource`, coordinate mapping to image-height units, permission flow.
