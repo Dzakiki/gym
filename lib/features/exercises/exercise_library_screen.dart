@@ -9,14 +9,21 @@ import 'package:formcoach/features/exercises/exercise_providers.dart';
 import 'package:go_router/go_router.dart';
 
 /// Browse and search every exercise.
+///
+/// In [selectMode] tapping an exercise closes the screen and returns it to the
+/// caller (used when adding an exercise to a routine).
 class ExerciseLibraryScreen extends ConsumerWidget {
-  const ExerciseLibraryScreen({super.key});
+  const ExerciseLibraryScreen({this.selectMode = false, super.key});
+
+  final bool selectMode;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final exercises = ref.watch(filteredExercisesProvider);
     return Scaffold(
-      appBar: AppBar(title: const Text('Exercise library')),
+      appBar: AppBar(
+        title: Text(selectMode ? 'Choose an exercise' : 'Exercise library'),
+      ),
       body: Column(
         children: [
           const _SearchField(),
@@ -35,7 +42,7 @@ class ExerciseLibraryScreen extends ConsumerWidget {
                       title: 'No exercises found',
                       message: 'Try a different search or filter.',
                     )
-                  : _ExerciseList(items: items),
+                  : _ExerciseList(items: items, selectMode: selectMode),
             ),
           ),
         ],
@@ -99,9 +106,10 @@ class _FilterChips extends ConsumerWidget {
 }
 
 class _ExerciseList extends StatelessWidget {
-  const _ExerciseList({required this.items});
+  const _ExerciseList({required this.items, required this.selectMode});
 
   final List<Exercise> items;
+  final bool selectMode;
 
   @override
   Widget build(BuildContext context) {
@@ -122,7 +130,9 @@ class _ExerciseList extends StatelessWidget {
                   color: Theme.of(context).colorScheme.primary,
                   semanticLabel: 'AI Coach supported',
                 ),
-          onTap: () => context.push(AppRoutes.exerciseDetail(exercise.id)),
+          onTap: () => selectMode
+              ? context.pop(exercise)
+              : context.push(AppRoutes.exerciseDetail(exercise.id)),
         );
       },
     );

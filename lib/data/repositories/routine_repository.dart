@@ -4,6 +4,7 @@ import 'package:drift/drift.dart';
 import 'package:formcoach/core/clock.dart';
 import 'package:formcoach/core/ids.dart';
 import 'package:formcoach/data/local/app_database.dart';
+import 'package:formcoach/data/repositories/routine_draft.dart';
 
 /// One exercise of a routine together with the exercise it refers to.
 class RoutineItem {
@@ -50,7 +51,7 @@ class RoutineRepository {
 
     Future<void> emit() async {
       try {
-        final detail = await _loadDetail(id);
+        final detail = await getDetail(id);
         if (!controller.isClosed) controller.add(detail);
       } on Object catch (error, stackTrace) {
         if (!controller.isClosed) controller.addError(error, stackTrace);
@@ -78,7 +79,8 @@ class RoutineRepository {
     return controller.stream;
   }
 
-  Future<RoutineDetail?> _loadDetail(String id) async {
+  /// Loads the routine with [id] and its exercises once.
+  Future<RoutineDetail?> getDetail(String id) async {
     final routine = await (_database.select(
       _database.routines,
     )..where((r) => r.id.equals(id) & r.deletedAt.isNull())).getSingleOrNull();
@@ -109,11 +111,111 @@ class RoutineRepository {
     );
   }
 
+  /// Creates or updates a routine from [draft] and returns its id.
+  ///
+  /// Throws [ArgumentError] if the draft is invalid and [StateError] if the
+  /// routine does not exist or is a read-only template. Exercises removed from
+  /// the draft are soft-deleted; the others keep their id and creation time.
+  Future<String> saveRoutine(RoutineDraft draft) {
+    final error = draft.validationError;
+    if (error != null) throw ArgumentError(error);
+
+    return _database.transaction(() async {
+      final now = _clock();
+      final routineId = draft.id ?? _newId();
+      final name = draft.name.trim();
+      final description = draft.description.trim();
+
+      if (draft.id == null) {
+        await _database
+            .into(_database.routines)
+            .insert(
+              RoutinesCompanion.insert(
+                id: routineId,
+                name: name,
+                description: Value(description),
+                scheduleDays: Value(draft.scheduleDays),
+                createdAt: now,
+                updatedAt: now,
+              ),
+            );
+      } else {
+        final updated =
+            await (_database.update(_database.routines)..where(
+                  (r) =>
+                      r.id.equals(routineId) &
+                      r.isTemplate.equals(false) &
+                      r.deletedAt.isNull(),
+                ))
+                .write(
+                  RoutinesCompanion(
+                    name: Value(name),
+                    description: Value(description),
+                    scheduleDays: Value(draft.scheduleDays),
+                    updatedAt: Value(now),
+                  ),
+                );
+        if (updated == 0) {
+          throw StateError(
+            'Routine $routineId does not exist or is read-only.',
+          );
+        }
+      }
+
+      final keptIds = <String>[];
+      for (var position = 0; position < draft.items.length; position++) {
+        final item = draft.items[position];
+        final itemId = item.id ?? _newId();
+        keptIds.add(itemId);
+        await _database
+            .into(_database.routineExercises)
+            .insert(
+              RoutineExercisesCompanion.insert(
+                id: itemId,
+                routineId: routineId,
+                exerciseId: item.exerciseId,
+                position: position,
+                targetSets: Value(item.targetSets),
+                targetReps: Value(item.targetReps),
+                targetSeconds: Value(item.targetSeconds),
+                restSeconds: Value(item.restSeconds),
+                createdAt: now,
+                updatedAt: now,
+              ),
+              onConflict: DoUpdate(
+                (old) => RoutineExercisesCompanion(
+                  position: Value(position),
+                  targetSets: Value(item.targetSets),
+                  targetReps: Value(item.targetReps),
+                  targetSeconds: Value(item.targetSeconds),
+                  restSeconds: Value(item.restSeconds),
+                  updatedAt: Value(now),
+                ),
+              ),
+            );
+      }
+
+      await (_database.update(_database.routineExercises)..where(
+            (e) =>
+                e.routineId.equals(routineId) &
+                e.deletedAt.isNull() &
+                e.id.isNotIn(keptIds),
+          ))
+          .write(
+            RoutineExercisesCompanion(
+              deletedAt: Value(now),
+              updatedAt: Value(now),
+            ),
+          );
+      return routineId;
+    });
+  }
+
   /// Copies a template into a new, editable routine of the user.
   /// Returns the new routine's id, or null if [templateId] is not a template.
   Future<String?> copyTemplate(String templateId) {
     return _database.transaction(() async {
-      final template = await _loadDetail(templateId);
+      final template = await getDetail(templateId);
       if (template == null || !template.routine.isTemplate) return null;
 
       final now = _clock();

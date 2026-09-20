@@ -23,7 +23,14 @@ class WorkoutsScreen extends ConsumerWidget {
             trailing: const Icon(Icons.chevron_right),
             onTap: () => context.push(AppRoutes.exerciseLibrary),
           ),
-          const _SectionHeader('My routines'),
+          _SectionHeader(
+            'My routines',
+            action: IconButton(
+              icon: const Icon(Icons.add),
+              tooltip: 'New routine',
+              onPressed: () => context.push(AppRoutes.newRoutine),
+            ),
+          ),
           const _RoutineSection(
             templates: false,
             emptyMessage:
@@ -38,15 +45,23 @@ class WorkoutsScreen extends ConsumerWidget {
 }
 
 class _SectionHeader extends StatelessWidget {
-  const _SectionHeader(this.title);
+  const _SectionHeader(this.title, {this.action});
 
   final String title;
+  final Widget? action;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
-      child: Text(title, style: Theme.of(context).textTheme.titleMedium),
+      padding: EdgeInsets.fromLTRB(16, action == null ? 24 : 16, 8, 0),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(title, style: Theme.of(context).textTheme.titleMedium),
+          ),
+          ?action,
+        ],
+      ),
     );
   }
 }

@@ -7,6 +7,7 @@ import 'package:formcoach/features/exercises/exercise_library_screen.dart';
 import 'package:formcoach/features/home/home_screen.dart';
 import 'package:formcoach/features/profile/profile_screen.dart';
 import 'package:formcoach/features/progress/progress_screen.dart';
+import 'package:formcoach/features/routines/routine_builder_screen.dart';
 import 'package:formcoach/features/routines/routine_detail_screen.dart';
 import 'package:formcoach/features/shell/shell_scaffold.dart';
 import 'package:formcoach/features/workouts/workouts_screen.dart';
@@ -36,9 +37,24 @@ List<RouteBase> _subRoutesFor(AppTab tab) => switch (tab) {
       ],
     ),
     GoRoute(
+      path: 'pick-exercise',
+      builder: (context, state) =>
+          const ExerciseLibraryScreen(selectMode: true),
+    ),
+    // 'routines/new' must come before 'routines/:id' so it is not read as an id.
+    GoRoute(
+      path: 'routines/new',
+      builder: (context, state) => const RoutineBuilderScreen(),
+    ),
+    GoRoute(
       path: 'routines/:id',
       builder: (context, state) =>
           RoutineDetailScreen(routineId: state.pathParameters['id']!),
+    ),
+    GoRoute(
+      path: 'routines/:id/edit',
+      builder: (context, state) =>
+          RoutineBuilderScreen(routineId: state.pathParameters['id']),
     ),
   ],
   _ => const [],
