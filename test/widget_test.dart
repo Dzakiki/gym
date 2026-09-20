@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:formcoach/app/app.dart';
 import 'package:formcoach/app/app_tab.dart';
 import 'package:formcoach/features/coach/coach_screen.dart';
 import 'package:formcoach/features/home/home_screen.dart';
@@ -9,29 +7,21 @@ import 'package:formcoach/features/profile/profile_screen.dart';
 import 'package:formcoach/features/progress/progress_screen.dart';
 import 'package:formcoach/features/workouts/workouts_screen.dart';
 
+import 'helpers/app_harness.dart';
+
 void main() {
-  Future<void> pumpApp(WidgetTester tester) async {
-    await tester.pumpWidget(const ProviderScope(child: FormCoachApp()));
-    await tester.pumpAndSettle();
-  }
-
-  testWidgets('starts on the Home tab', (tester) async {
-    await pumpApp(tester);
-
+  appTest('starts on the Home tab', (tester, db) async {
     expect(find.byType(HomeScreen), findsOneWidget);
   });
 
-  testWidgets('shows one destination per tab', (tester) async {
-    await pumpApp(tester);
-
+  appTest('shows one destination per tab', (tester, db) async {
     expect(
       find.byType(NavigationDestination),
       findsNWidgets(AppTab.values.length),
     );
   });
 
-  testWidgets('tapping each tab shows its screen', (tester) async {
-    await pumpApp(tester);
+  appTest('tapping each tab shows its screen', (tester, db) async {
     final screens = <AppTab, Type>{
       AppTab.workouts: WorkoutsScreen,
       AppTab.coach: CoachScreen,

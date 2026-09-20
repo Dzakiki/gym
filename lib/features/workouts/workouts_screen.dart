@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:formcoach/app/routes.dart';
+import 'package:formcoach/data/local/app_database.dart';
+import 'package:formcoach/features/routines/routine_formatting.dart';
+import 'package:formcoach/features/routines/routine_providers.dart';
 import 'package:go_router/go_router.dart';
 
-class WorkoutsScreen extends StatelessWidget {
+/// Entry point for routines, program templates and the exercise library.
+class WorkoutsScreen extends ConsumerWidget {
   const WorkoutsScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       appBar: AppBar(title: const Text('Workouts')),
       body: ListView(
@@ -18,8 +23,77 @@ class WorkoutsScreen extends StatelessWidget {
             trailing: const Icon(Icons.chevron_right),
             onTap: () => context.push(AppRoutes.exerciseLibrary),
           ),
+          const _SectionHeader('My routines'),
+          const _RoutineSection(
+            templates: false,
+            emptyMessage:
+                'No routines yet. Copy a program template below to start.',
+          ),
+          const _SectionHeader('Program templates'),
+          const _RoutineSection(templates: true),
         ],
       ),
+    );
+  }
+}
+
+class _SectionHeader extends StatelessWidget {
+  const _SectionHeader(this.title);
+
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
+      child: Text(title, style: Theme.of(context).textTheme.titleMedium),
+    );
+  }
+}
+
+class _RoutineSection extends ConsumerWidget {
+  const _RoutineSection({required this.templates, this.emptyMessage});
+
+  final bool templates;
+  final String? emptyMessage;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final routines = ref.watch(routinesProvider(templates));
+    return routines.when(
+      loading: () => const Padding(
+        padding: EdgeInsets.all(24),
+        child: Center(child: CircularProgressIndicator()),
+      ),
+      error: (error, stack) => const ListTile(
+        leading: Icon(Icons.error_outline),
+        title: Text('Could not load routines'),
+      ),
+      data: (items) {
+        if (items.isEmpty) {
+          return ListTile(title: Text(emptyMessage ?? 'Nothing here yet.'));
+        }
+        return Column(
+          children: [for (final routine in items) _RoutineTile(routine)],
+        );
+      },
+    );
+  }
+}
+
+class _RoutineTile extends StatelessWidget {
+  const _RoutineTile(this.routine);
+
+  final Routine routine;
+
+  @override
+  Widget build(BuildContext context) {
+    final days = routine.scheduleDays.map(weekdayLabel).join(', ');
+    return ListTile(
+      title: Text(routine.name),
+      subtitle: Text(days.isEmpty ? routine.description : days),
+      trailing: const Icon(Icons.chevron_right),
+      onTap: () => context.push(AppRoutes.routineDetail(routine.id)),
     );
   }
 }

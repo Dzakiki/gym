@@ -1,0 +1,69 @@
+[
+  {
+    "slug": "beginner-full-body",
+    "name": "Beginner full body",
+    "description": "Three easy full-body sessions a week to build a base.",
+    "scheduleDays": [1, 3, 5],
+    "items": [
+      {"exercise": "squat", "sets": 3, "reps": 10, "rest": 90},
+      {"exercise": "push-up", "sets": 3, "reps": 8, "rest": 90},
+      {"exercise": "glute-bridge", "sets": 3, "reps": 12, "rest": 60},
+      {"exercise": "dumbbell-row", "sets": 3, "reps": 10, "rest": 90},
+      {"exercise": "plank", "sets": 3, "seconds": 30, "rest": 60}
+    ]
+  },
+  {
+    "slug": "home-bodyweight",
+    "name": "Home bodyweight",
+    "description": "No equipment needed. Includes every AI Coach exercise.",
+    "scheduleDays": [1, 2, 4, 6],
+    "items": [
+      {"exercise": "squat", "sets": 4, "reps": 15, "rest": 60},
+      {"exercise": "push-up", "sets": 4, "reps": 10, "rest": 60},
+      {"exercise": "lunge", "sets": 3, "reps": 12, "rest": 60},
+      {"exercise": "jumping-jack", "sets": 3, "reps": 30, "rest": 45},
+      {"exercise": "plank", "sets": 3, "seconds": 45, "rest": 45}
+    ]
+  },
+  {
+    "slug": "push-day",
+    "name": "Push day",
+    "description": "Chest, shoulders and triceps.",
+    "scheduleDays": [1, 4],
+    "items": [
+      {"exercise": "bench-press", "sets": 4, "reps": 8, "rest": 120},
+      {"exercise": "dumbbell-shoulder-press", "sets": 3, "reps": 10, "rest": 90},
+      {"exercise": "lateral-raise", "sets": 3, "reps": 12, "rest": 60},
+      {"exercise": "tricep-extension", "sets": 3, "reps": 12, "rest": 60},
+      {"exercise": "push-up", "sets": 2, "reps": 15, "rest": 60}
+    ]
+  },
+  {
+    "slug": "pull-day",
+    "name": "Pull day",
+    "description": "Back and biceps.",
+    "scheduleDays": [2, 5],
+    "items": [
+      {"exercise": "deadlift", "sets": 3, "reps": 5, "rest": 150},
+      {"exercise": "lat-pulldown", "sets": 3, "reps": 10, "rest": 90},
+      {"exercise": "barbell-row", "sets": 3, "reps": 8, "rest": 90},
+      {"exercise": "seated-cable-row", "sets": 3, "reps": 12, "rest": 60},
+      {"exercise": "bicep-curl", "sets": 3, "reps": 12, "rest": 60},
+      {"exercise": "hammer-curl", "sets": 3, "reps": 12, "rest": 60}
+    ]
+  },
+  {
+    "slug": "leg-day",
+    "name": "Leg day",
+    "description": "Quads, hamstrings, glutes and calves.",
+    "scheduleDays": [3, 6],
+    "items": [
+      {"exercise": "barbell-back-squat", "sets": 4, "reps": 6, "rest": 150},
+      {"exercise": "leg-press", "sets": 3, "reps": 10, "rest": 90},
+      {"exercise": "dumbbell-romanian-deadlift", "sets": 3, "reps": 10, "rest": 90},
+      {"exercise": "leg-curl", "sets": 3, "reps": 12, "rest": 60},
+      {"exercise": "leg-extension", "sets": 3, "reps": 12, "rest": 60},
+      {"exercise": "calf-raise", "sets": 4, "reps": 15, "rest": 45}
+    ]
+  }
+]

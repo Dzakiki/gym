@@ -7,8 +7,8 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   final container = ProviderContainer();
-  // Make sure the built-in exercise library exists before the UI reads it.
-  await container.read(exerciseSeederProvider).seed();
+  // Make sure the built-in exercises and templates exist before the UI reads them.
+  await container.read(seedServiceProvider).seedAll();
 
   runApp(
     UncontrolledProviderScope(
