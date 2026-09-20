@@ -5,6 +5,7 @@ import 'package:formcoach/core/ids.dart';
 import 'package:formcoach/data/local/app_database.dart';
 import 'package:formcoach/data/repositories/coach_repository.dart';
 import 'package:formcoach/data/repositories/exercise_repository.dart';
+import 'package:formcoach/data/repositories/progress_repository.dart';
 import 'package:formcoach/data/repositories/routine_repository.dart';
 import 'package:formcoach/data/repositories/workout_repository.dart';
 import 'package:formcoach/data/seed/exercise_seeder.dart';
@@ -33,6 +34,10 @@ final routineRepositoryProvider = Provider<RoutineRepository>((ref) {
     newId: ref.watch(idGeneratorProvider),
   );
 });
+
+final progressRepositoryProvider = Provider<ProgressRepository>(
+  (ref) => ProgressRepository(ref.watch(appDatabaseProvider)),
+);
 
 final coachRepositoryProvider = Provider<CoachRepository>((ref) {
   return CoachRepository(

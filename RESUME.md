@@ -29,7 +29,8 @@ Read this first, then `IMPLEMENTATION_PLAN.md` for the full design.
 | Coach exercise: jumping jack (front view) | Merged (PR #22) |
 | Settings: kg/lb and spoken-cue switch, Profile screen | Merged (PR #24) |
 | Coached sets saved into workouts (`coach_analyses`, schema v2 migration), Start with AI Coach | Merged (PR #25) |
-| Home screen (streak, today's routine, resume) | In the latest PR (see `git log`) |
+| Home screen (streak, today's routine, resume) | Merged (PR #26) |
+| Progress: weekly volume chart, form-score chart, personal records | In the latest PR (see `git log`) |
 
 `main` is protected: PR required, checks `analyze-test` and `android-build` must pass, squash-merge only.
 
