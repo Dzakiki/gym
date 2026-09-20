@@ -1,11 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:formcoach/features/form_coach/demo/pose_synth.dart';
 import 'package:formcoach/features/form_coach/engine/body_side.dart';
 import 'package:formcoach/features/form_coach/engine/coach_session.dart';
 import 'package:formcoach/features/form_coach/engine/rep_scorer.dart';
 import 'package:formcoach/features/form_coach/exercises/squat.dart';
 import 'package:formcoach/features/form_coach/pose/pose.dart';
-
-import '../../helpers/pose_synth.dart';
 
 /// Feeds [frames] to a fresh squat session and returns everything it said.
 ({CoachSession session, List<CoachUpdate> updates}) _run(

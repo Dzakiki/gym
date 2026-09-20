@@ -1,10 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:formcoach/features/form_coach/demo/pose_synth.dart';
 import 'package:formcoach/features/form_coach/engine/body_side.dart';
 import 'package:formcoach/features/form_coach/engine/rep_summary.dart';
 import 'package:formcoach/features/form_coach/exercises/squat.dart';
 import 'package:formcoach/features/form_coach/pose/pose.dart';
-
-import '../../helpers/pose_synth.dart';
 
 /// A repetition summary with the given measurements at the bottom.
 RepSummary _rep({
