@@ -1,54 +1,46 @@
+import 'dart:math' as math;
+
 import 'package:formcoach/features/form_coach/demo/kinematics.dart';
 import 'package:formcoach/features/form_coach/demo/pose_synth.dart';
 import 'package:formcoach/features/form_coach/engine/geometry.dart';
 import 'package:formcoach/features/form_coach/pose/pose.dart';
 
-/// Segment lengths of the synthetic push-up body, in image-height units.
 const _upperArm = 0.14;
 const _forearm = 0.14;
-const _bodyLength = 0.58; // ankle to shoulder
-const _handsFromFeet = 0.51;
+const _torso = 0.30;
 
-/// Builds a side-view push-up skeleton.
+/// Builds a side-view skeleton of a dip on parallel bars or two chairs.
 ///
-/// The feet and hands stay on the floor. [elbowAngle] is the angle at the
-/// elbow (180 is straight). The shoulder is wherever the fixed body length
-/// and the arm length allow. [hipOffset] moves the hips off the straight
-/// line from shoulders to ankles, as a fraction of the body length: positive
-/// is up (piked), negative is down (sagging).
-Map<Landmark, LandmarkPoint> pushupPose({
+/// The hands stay on the supports. As the elbows bend the shoulders sink and
+/// move forward of the hands while the elbows travel back. [torsoLean] tilts the upper body forward from
+/// vertical, in degrees. The person faces right unless [facingRight] is false.
+Map<Landmark, LandmarkPoint> dipPose({
   required double elbowAngle,
-  double hipOffset = 0,
+  double torsoLean = 10,
   bool facingRight = true,
   double likelihood = 1,
 }) {
-  const ankle = Vec2(0.12, 0.80);
-  const wrist = Vec2(0.12 + _handsFromFeet, 0.80);
-
-  // Distance from wrist to shoulder for this elbow angle (law of cosines).
+  const wrist = Vec2(0.55, 0.45);
   final reach = spanAcrossJoint(_upperArm, _forearm, elbowAngle);
-  final shoulder = upperIntersection(ankle, _bodyLength, wrist, reach);
 
-  // The elbow points back towards the feet.
+  // The shoulder moves forward of the hands as the arms bend.
+  final bend = ((180 - elbowAngle) / 90).clamp(0.0, 1.0);
+  final forward = math.min(0.12 * bend, reach * 0.95);
+  final shoulder =
+      wrist + Vec2(forward, -math.sqrt(reach * reach - forward * forward));
   final elbow = leftIntersection(shoulder, _upperArm, wrist, _forearm);
 
-  final along = (shoulder - ankle) * (1 / (shoulder - ankle).length);
-  final up = Vec2(along.y, -along.x);
-  Vec2 onBody(double fraction, [double lift = 0]) =>
-      ankle + (shoulder - ankle) * fraction + up * (lift * _bodyLength);
-
-  final hip = onBody(0.55, hipOffset);
-  final knee = onBody(0.28, hipOffset * 0.5);
-  final nose = shoulder + along * 0.08;
-  final toe = ankle + const Vec2(-0.04, 0);
-  final heel = ankle + const Vec2(0.02, 0);
+  final lean = torsoLean * math.pi / 180;
+  final hip = shoulder + Vec2(-math.sin(lean), math.cos(lean)) * _torso;
+  final knee = hip + const Vec2(0.03, 0.20);
+  final ankle = knee + const Vec2(-0.06, 0.20);
 
   Vec2 face(Vec2 point) => facingRight ? point : Vec2(1 - point.x, point.y);
   LandmarkPoint point(Vec2 position) =>
       LandmarkPoint(face(position), likelihood: likelihood);
 
   return {
-    Landmark.nose: point(nose),
+    Landmark.nose: point(shoulder + const Vec2(0.03, -0.07)),
     for (final side in ['left', 'right']) ...{
       Landmark.values.byName('${side}Shoulder'): point(shoulder),
       Landmark.values.byName('${side}Elbow'): point(elbow),
@@ -56,19 +48,21 @@ Map<Landmark, LandmarkPoint> pushupPose({
       Landmark.values.byName('${side}Hip'): point(hip),
       Landmark.values.byName('${side}Knee'): point(knee),
       Landmark.values.byName('${side}Ankle'): point(ankle),
-      Landmark.values.byName('${side}Heel'): point(heel),
-      Landmark.values.byName('${side}FootIndex'): point(toe),
+      Landmark.values.byName('${side}Heel'): point(ankle + const Vec2(0.02, 0)),
+      Landmark.values.byName('${side}FootIndex'): point(
+        ankle + const Vec2(-0.04, 0),
+      ),
     },
   };
 }
 
-/// Describes a set of push-ups to generate.
-class PushupMotion {
-  const PushupMotion({
+/// Describes a set of dips to generate.
+class DipMotion {
+  const DipMotion({
     this.reps = 3,
     this.topElbow = 170,
-    this.bottomElbow = 75,
-    this.hipOffset = 0,
+    this.bottomElbow = 80,
+    this.torsoLean = 10,
     this.down = const Duration(milliseconds: 1500),
     this.up = const Duration(milliseconds: 1500),
     this.rest = const Duration(milliseconds: 800),
@@ -79,9 +73,7 @@ class PushupMotion {
   final int reps;
   final double topElbow;
   final double bottomElbow;
-
-  /// Hips off the shoulder-ankle line, as a fraction of the body length.
-  final double hipOffset;
+  final double torsoLean;
   final Duration down;
   final Duration up;
   final Duration rest;
@@ -89,17 +81,17 @@ class PushupMotion {
   final double noise;
 }
 
-/// Generates the camera frames of a set of push-ups.
-List<PoseFrame> pushupFrames(
-  PushupMotion motion, {
+/// Generates the camera frames of a set of dips.
+List<PoseFrame> dipFrames(
+  DipMotion motion, {
   int fps = 30,
   Duration start = Duration.zero,
 }) {
   return repetitionFrames(
-    (depth) => pushupPose(
+    (depth) => dipPose(
       elbowAngle:
           motion.topElbow + (motion.bottomElbow - motion.topElbow) * depth,
-      hipOffset: motion.hipOffset,
+      torsoLean: motion.torsoLean,
       facingRight: motion.facingRight,
     ),
     reps: motion.reps,
