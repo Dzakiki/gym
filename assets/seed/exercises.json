@@ -1,0 +1,592 @@
+[
+  {
+    "slug": "squat",
+    "name": "Squat",
+    "category": "strength",
+    "equipment": "bodyweight",
+    "primaryMuscles": [
+      "quadriceps",
+      "glutes"
+    ],
+    "coachKey": "squat",
+    "instructions": "Stand feet shoulder-width apart, sit your hips back and down until your thighs are parallel to the floor, then drive up through your heels."
+  },
+  {
+    "slug": "push-up",
+    "name": "Push-up",
+    "category": "strength",
+    "equipment": "bodyweight",
+    "primaryMuscles": [
+      "chest",
+      "triceps",
+      "shoulders"
+    ],
+    "coachKey": "pushup",
+    "instructions": "Hands under shoulders, body in a straight line. Lower your chest to the floor, then press back up without letting your hips sag."
+  },
+  {
+    "slug": "lunge",
+    "name": "Lunge",
+    "category": "strength",
+    "equipment": "bodyweight",
+    "primaryMuscles": [
+      "quadriceps",
+      "glutes"
+    ],
+    "coachKey": "lunge",
+    "instructions": "Step forward and lower until both knees are about 90 degrees, keep your torso upright, then push back to standing."
+  },
+  {
+    "slug": "plank",
+    "name": "Plank",
+    "category": "core",
+    "equipment": "bodyweight",
+    "primaryMuscles": [
+      "core"
+    ],
+    "coachKey": "plank",
+    "instructions": "Forearms on the floor, elbows under shoulders. Hold a straight line from head to heels with your core braced."
+  },
+  {
+    "slug": "jumping-jack",
+    "name": "Jumping jack",
+    "category": "cardio",
+    "equipment": "bodyweight",
+    "primaryMuscles": [
+      "fullBody"
+    ],
+    "coachKey": "jumping_jack",
+    "instructions": "Jump your feet wide while raising both arms overhead, then jump back to the start."
+  },
+  {
+    "slug": "pull-up",
+    "name": "Pull-up",
+    "category": "strength",
+    "equipment": "bodyweight",
+    "primaryMuscles": [
+      "back",
+      "biceps"
+    ],
+    "coachKey": null,
+    "instructions": "Hang from a bar with an overhand grip, pull until your chin passes the bar, then lower with control."
+  },
+  {
+    "slug": "chin-up",
+    "name": "Chin-up",
+    "category": "strength",
+    "equipment": "bodyweight",
+    "primaryMuscles": [
+      "back",
+      "biceps"
+    ],
+    "coachKey": null,
+    "instructions": "Hang with an underhand grip, pull your chin over the bar, and lower slowly."
+  },
+  {
+    "slug": "bench-dip",
+    "name": "Bench dip",
+    "category": "strength",
+    "equipment": "bodyweight",
+    "primaryMuscles": [
+      "triceps",
+      "chest"
+    ],
+    "coachKey": null,
+    "instructions": "Hands on a bench behind you, lower your body by bending the elbows, then press back up."
+  },
+  {
+    "slug": "glute-bridge",
+    "name": "Glute bridge",
+    "category": "strength",
+    "equipment": "bodyweight",
+    "primaryMuscles": [
+      "glutes",
+      "hamstrings"
+    ],
+    "coachKey": null,
+    "instructions": "Lie on your back with knees bent, drive your hips up until your body is straight from shoulders to knees, and lower."
+  },
+  {
+    "slug": "sit-up",
+    "name": "Sit-up",
+    "category": "core",
+    "equipment": "bodyweight",
+    "primaryMuscles": [
+      "core"
+    ],
+    "coachKey": null,
+    "instructions": "Lie on your back with knees bent and curl your torso up to your thighs, then lower with control."
+  },
+  {
+    "slug": "crunch",
+    "name": "Crunch",
+    "category": "core",
+    "equipment": "bodyweight",
+    "primaryMuscles": [
+      "core"
+    ],
+    "coachKey": null,
+    "instructions": "Lie on your back, lift your shoulders off the floor by contracting your abs, and lower slowly."
+  },
+  {
+    "slug": "mountain-climber",
+    "name": "Mountain climber",
+    "category": "cardio",
+    "equipment": "bodyweight",
+    "primaryMuscles": [
+      "core",
+      "fullBody"
+    ],
+    "coachKey": null,
+    "instructions": "From a high plank, drive your knees toward your chest alternately at a steady pace."
+  },
+  {
+    "slug": "burpee",
+    "name": "Burpee",
+    "category": "cardio",
+    "equipment": "bodyweight",
+    "primaryMuscles": [
+      "fullBody"
+    ],
+    "coachKey": null,
+    "instructions": "Squat down, kick your feet back to a plank, do a push-up, jump your feet in, and jump up."
+  },
+  {
+    "slug": "superman",
+    "name": "Superman",
+    "category": "core",
+    "equipment": "bodyweight",
+    "primaryMuscles": [
+      "back",
+      "glutes"
+    ],
+    "coachKey": null,
+    "instructions": "Lie face down and lift your arms and legs off the floor together, hold briefly, then lower."
+  },
+  {
+    "slug": "wall-sit",
+    "name": "Wall sit",
+    "category": "strength",
+    "equipment": "bodyweight",
+    "primaryMuscles": [
+      "quadriceps",
+      "glutes"
+    ],
+    "coachKey": null,
+    "instructions": "Slide down a wall until your knees are at 90 degrees and hold the position."
+  },
+  {
+    "slug": "calf-raise",
+    "name": "Calf raise",
+    "category": "strength",
+    "equipment": "bodyweight",
+    "primaryMuscles": [
+      "calves"
+    ],
+    "coachKey": null,
+    "instructions": "Stand tall and rise onto the balls of your feet, pause at the top, and lower slowly."
+  },
+  {
+    "slug": "step-up",
+    "name": "Step-up",
+    "category": "strength",
+    "equipment": "bodyweight",
+    "primaryMuscles": [
+      "quadriceps",
+      "glutes"
+    ],
+    "coachKey": null,
+    "instructions": "Step onto a sturdy box with one foot, drive up until standing, and step back down."
+  },
+  {
+    "slug": "pike-push-up",
+    "name": "Pike push-up",
+    "category": "strength",
+    "equipment": "bodyweight",
+    "primaryMuscles": [
+      "shoulders",
+      "triceps"
+    ],
+    "coachKey": null,
+    "instructions": "From a downward-dog position, bend your elbows to lower your head toward the floor, then press up."
+  },
+  {
+    "slug": "russian-twist",
+    "name": "Russian twist",
+    "category": "core",
+    "equipment": "bodyweight",
+    "primaryMuscles": [
+      "core"
+    ],
+    "coachKey": null,
+    "instructions": "Sit with knees bent and torso leaned back, rotate your shoulders side to side."
+  },
+  {
+    "slug": "leg-raise",
+    "name": "Leg raise",
+    "category": "core",
+    "equipment": "bodyweight",
+    "primaryMuscles": [
+      "core"
+    ],
+    "coachKey": null,
+    "instructions": "Lie on your back and lift straight legs to vertical, then lower without touching the floor."
+  },
+  {
+    "slug": "bird-dog",
+    "name": "Bird dog",
+    "category": "core",
+    "equipment": "bodyweight",
+    "primaryMuscles": [
+      "core",
+      "back"
+    ],
+    "coachKey": null,
+    "instructions": "On hands and knees, extend the opposite arm and leg, hold, and switch sides."
+  },
+  {
+    "slug": "dead-bug",
+    "name": "Dead bug",
+    "category": "core",
+    "equipment": "bodyweight",
+    "primaryMuscles": [
+      "core"
+    ],
+    "coachKey": null,
+    "instructions": "Lie on your back with arms up and knees bent, lower the opposite arm and leg while keeping your back flat."
+  },
+  {
+    "slug": "dumbbell-bench-press",
+    "name": "Dumbbell bench press",
+    "category": "strength",
+    "equipment": "dumbbell",
+    "primaryMuscles": [
+      "chest",
+      "triceps",
+      "shoulders"
+    ],
+    "coachKey": null,
+    "instructions": "Lie on a bench, press two dumbbells from chest level to arms extended, and lower under control."
+  },
+  {
+    "slug": "dumbbell-shoulder-press",
+    "name": "Dumbbell shoulder press",
+    "category": "strength",
+    "equipment": "dumbbell",
+    "primaryMuscles": [
+      "shoulders",
+      "triceps"
+    ],
+    "coachKey": null,
+    "instructions": "Press dumbbells from shoulder height to overhead without arching your lower back."
+  },
+  {
+    "slug": "dumbbell-row",
+    "name": "Dumbbell row",
+    "category": "strength",
+    "equipment": "dumbbell",
+    "primaryMuscles": [
+      "back",
+      "biceps"
+    ],
+    "coachKey": null,
+    "instructions": "Hand and knee on a bench, pull the dumbbell to your hip and lower it slowly."
+  },
+  {
+    "slug": "bicep-curl",
+    "name": "Bicep curl",
+    "category": "strength",
+    "equipment": "dumbbell",
+    "primaryMuscles": [
+      "biceps"
+    ],
+    "coachKey": null,
+    "instructions": "Curl the dumbbells up with your elbows fixed at your sides, then lower slowly."
+  },
+  {
+    "slug": "hammer-curl",
+    "name": "Hammer curl",
+    "category": "strength",
+    "equipment": "dumbbell",
+    "primaryMuscles": [
+      "biceps",
+      "forearms"
+    ],
+    "coachKey": null,
+    "instructions": "Curl with palms facing each other, keeping your elbows still."
+  },
+  {
+    "slug": "tricep-extension",
+    "name": "Overhead tricep extension",
+    "category": "strength",
+    "equipment": "dumbbell",
+    "primaryMuscles": [
+      "triceps"
+    ],
+    "coachKey": null,
+    "instructions": "Hold one dumbbell overhead with both hands, bend the elbows to lower it behind your head, and extend."
+  },
+  {
+    "slug": "goblet-squat",
+    "name": "Goblet squat",
+    "category": "strength",
+    "equipment": "dumbbell",
+    "primaryMuscles": [
+      "quadriceps",
+      "glutes"
+    ],
+    "coachKey": null,
+    "instructions": "Hold a dumbbell at your chest and squat deep, keeping your chest up."
+  },
+  {
+    "slug": "dumbbell-romanian-deadlift",
+    "name": "Dumbbell Romanian deadlift",
+    "category": "strength",
+    "equipment": "dumbbell",
+    "primaryMuscles": [
+      "hamstrings",
+      "glutes"
+    ],
+    "coachKey": null,
+    "instructions": "Hinge at the hips with a slight knee bend, lower the dumbbells along your legs, and stand tall."
+  },
+  {
+    "slug": "lateral-raise",
+    "name": "Lateral raise",
+    "category": "strength",
+    "equipment": "dumbbell",
+    "primaryMuscles": [
+      "shoulders"
+    ],
+    "coachKey": null,
+    "instructions": "Raise the dumbbells out to your sides to shoulder height with a soft elbow bend."
+  },
+  {
+    "slug": "dumbbell-lunge",
+    "name": "Dumbbell lunge",
+    "category": "strength",
+    "equipment": "dumbbell",
+    "primaryMuscles": [
+      "quadriceps",
+      "glutes"
+    ],
+    "coachKey": null,
+    "instructions": "Hold dumbbells at your sides and perform lunges, alternating legs."
+  },
+  {
+    "slug": "barbell-back-squat",
+    "name": "Barbell back squat",
+    "category": "strength",
+    "equipment": "barbell",
+    "primaryMuscles": [
+      "quadriceps",
+      "glutes"
+    ],
+    "coachKey": null,
+    "instructions": "Bar across your upper back, squat to at least parallel, and stand up keeping your torso braced."
+  },
+  {
+    "slug": "bench-press",
+    "name": "Bench press",
+    "category": "strength",
+    "equipment": "barbell",
+    "primaryMuscles": [
+      "chest",
+      "triceps",
+      "shoulders"
+    ],
+    "coachKey": null,
+    "instructions": "Lower the bar to your mid-chest with control and press it back up. Use a spotter for heavy sets."
+  },
+  {
+    "slug": "deadlift",
+    "name": "Deadlift",
+    "category": "strength",
+    "equipment": "barbell",
+    "primaryMuscles": [
+      "back",
+      "hamstrings",
+      "glutes"
+    ],
+    "coachKey": null,
+    "instructions": "With a flat back, drive through your legs to lift the bar to standing, then lower it along your legs."
+  },
+  {
+    "slug": "overhead-press",
+    "name": "Overhead press",
+    "category": "strength",
+    "equipment": "barbell",
+    "primaryMuscles": [
+      "shoulders",
+      "triceps"
+    ],
+    "coachKey": null,
+    "instructions": "Press the bar from your collarbone to overhead, moving your head through at the top."
+  },
+  {
+    "slug": "barbell-row",
+    "name": "Barbell row",
+    "category": "strength",
+    "equipment": "barbell",
+    "primaryMuscles": [
+      "back",
+      "biceps"
+    ],
+    "coachKey": null,
+    "instructions": "Hinge forward with a flat back, pull the bar to your lower ribs, and lower it slowly."
+  },
+  {
+    "slug": "hip-thrust",
+    "name": "Hip thrust",
+    "category": "strength",
+    "equipment": "barbell",
+    "primaryMuscles": [
+      "glutes",
+      "hamstrings"
+    ],
+    "coachKey": null,
+    "instructions": "Upper back on a bench with the bar over your hips, drive your hips up until your body is level."
+  },
+  {
+    "slug": "kettlebell-swing",
+    "name": "Kettlebell swing",
+    "category": "strength",
+    "equipment": "kettlebell",
+    "primaryMuscles": [
+      "glutes",
+      "hamstrings",
+      "back"
+    ],
+    "coachKey": null,
+    "instructions": "Hinge and swing the kettlebell to chest height by snapping your hips forward."
+  },
+  {
+    "slug": "lat-pulldown",
+    "name": "Lat pulldown",
+    "category": "strength",
+    "equipment": "machine",
+    "primaryMuscles": [
+      "back",
+      "biceps"
+    ],
+    "coachKey": null,
+    "instructions": "Pull the bar to your upper chest while keeping your torso steady, then let it rise with control."
+  },
+  {
+    "slug": "leg-press",
+    "name": "Leg press",
+    "category": "strength",
+    "equipment": "machine",
+    "primaryMuscles": [
+      "quadriceps",
+      "glutes"
+    ],
+    "coachKey": null,
+    "instructions": "Press the platform away until your legs are almost straight, then lower without lifting your hips."
+  },
+  {
+    "slug": "seated-cable-row",
+    "name": "Seated cable row",
+    "category": "strength",
+    "equipment": "machine",
+    "primaryMuscles": [
+      "back",
+      "biceps"
+    ],
+    "coachKey": null,
+    "instructions": "Pull the handle to your abdomen, squeeze your shoulder blades together, and return slowly."
+  },
+  {
+    "slug": "leg-curl",
+    "name": "Leg curl",
+    "category": "strength",
+    "equipment": "machine",
+    "primaryMuscles": [
+      "hamstrings"
+    ],
+    "coachKey": null,
+    "instructions": "Curl the pad toward your glutes and lower it with control."
+  },
+  {
+    "slug": "leg-extension",
+    "name": "Leg extension",
+    "category": "strength",
+    "equipment": "machine",
+    "primaryMuscles": [
+      "quadriceps"
+    ],
+    "coachKey": null,
+    "instructions": "Extend your legs until straight, pause, and lower slowly."
+  },
+  {
+    "slug": "band-pull-apart",
+    "name": "Band pull-apart",
+    "category": "strength",
+    "equipment": "band",
+    "primaryMuscles": [
+      "back",
+      "shoulders"
+    ],
+    "coachKey": null,
+    "instructions": "Hold a band at chest height and pull it apart by squeezing your shoulder blades."
+  },
+  {
+    "slug": "running",
+    "name": "Running",
+    "category": "cardio",
+    "equipment": "bodyweight",
+    "primaryMuscles": [
+      "fullBody"
+    ],
+    "coachKey": null,
+    "instructions": "Run at a steady, conversational pace with a relaxed upper body."
+  },
+  {
+    "slug": "cycling",
+    "name": "Cycling",
+    "category": "cardio",
+    "equipment": "machine",
+    "primaryMuscles": [
+      "quadriceps",
+      "calves"
+    ],
+    "coachKey": null,
+    "instructions": "Pedal at a steady cadence with the seat set so your knee is slightly bent at the bottom."
+  },
+  {
+    "slug": "jump-rope",
+    "name": "Jump rope",
+    "category": "cardio",
+    "equipment": "bodyweight",
+    "primaryMuscles": [
+      "calves",
+      "fullBody"
+    ],
+    "coachKey": null,
+    "instructions": "Turn the rope with your wrists and jump just high enough to clear it."
+  },
+  {
+    "slug": "cat-cow",
+    "name": "Cat-cow",
+    "category": "mobility",
+    "equipment": "bodyweight",
+    "primaryMuscles": [
+      "back",
+      "core"
+    ],
+    "coachKey": null,
+    "instructions": "On hands and knees, alternate arching and rounding your spine with your breathing."
+  },
+  {
+    "slug": "hip-flexor-stretch",
+    "name": "Hip flexor stretch",
+    "category": "mobility",
+    "equipment": "bodyweight",
+    "primaryMuscles": [
+      "quadriceps",
+      "glutes"
+    ],
+    "coachKey": null,
+    "instructions": "In a half-kneeling position, tuck your pelvis and shift forward until you feel a stretch at the front of the hip."
+  }
+]
