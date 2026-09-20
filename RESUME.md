@@ -15,7 +15,8 @@ Read this first, then `IMPLEMENTATION_PLAN.md` for the full design.
 | Workout repository (log sets, finish, discard) | Merged (PR #7) |
 | Active workout screen + in-app rest timer | Merged (PR #8) |
 | History (Progress tab list + workout detail + delete) | Merged (PR #9) |
-| Form Coach: geometry, One Euro filter, landmark smoother (pure Dart, `lib/features/form_coach/`) | In the latest PR (see `git log`) |
+| Form Coach: geometry, One Euro filter, landmark smoother (pure Dart, `lib/features/form_coach/`) | Merged (PR #10) |
+| Form Coach: `RepStateMachine` and `HoldTimer` | In the latest PR (see `git log`) |
 
 `main` is protected: PR required, checks `analyze-test` and `android-build` must pass, squash-merge only.
 
@@ -23,7 +24,6 @@ Read this first, then `IMPLEMENTATION_PLAN.md` for the full design.
 
 Form Coach engine (pure Dart, no phone needed; build in this order, test with synthetic pose sequences):
 
-- `feat/p3-rep-state-machine`: generic `RepStateMachine` (hysteresis, min rep duration, partial reps) and `HoldTimer` for plank.
 - `feat/p3-coach-session`: `FormRule`, `RepScorer`, `CueManager` (priority, cooldowns, "2 of last 3 reps" rule), `CoachSession` orchestrator, a synthetic pose generator for tests, and the squat `ExerciseDefinition`. See section 4 of `IMPLEMENTATION_PLAN.md` for thresholds.
 - Then push-up, lunge, plank, jumping jack definitions, one PR each.
 
