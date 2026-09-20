@@ -14,11 +14,20 @@ Read this first, then `IMPLEMENTATION_PLAN.md` for the full design.
 | Routine builder (create, edit, reorder, targets, schedule) | Merged (PR #6) |
 | Workout repository (log sets, finish, discard) | Merged (PR #7) |
 | Active workout screen + in-app rest timer | Merged (PR #8) |
-| History (Progress tab list + workout detail + delete) | In the latest PR (see `git log`) |
+| History (Progress tab list + workout detail + delete) | Merged (PR #9) |
+| Form Coach: geometry, One Euro filter, landmark smoother (pure Dart, `lib/features/form_coach/`) | In the latest PR (see `git log`) |
 
 `main` is protected: PR required, checks `analyze-test` and `android-build` must pass, squash-merge only.
 
 ## Next features (one branch + PR each)
+
+Form Coach engine (pure Dart, no phone needed; build in this order, test with synthetic pose sequences):
+
+- `feat/p3-rep-state-machine`: generic `RepStateMachine` (hysteresis, min rep duration, partial reps) and `HoldTimer` for plank.
+- `feat/p3-coach-session`: `FormRule`, `RepScorer`, `CueManager` (priority, cooldowns, "2 of last 3 reps" rule), `CoachSession` orchestrator, a synthetic pose generator for tests, and the squat `ExerciseDefinition`. See section 4 of `IMPLEMENTATION_PLAN.md` for thresholds.
+- Then push-up, lunge, plank, jumping jack definitions, one PR each.
+
+Workout tracking leftovers:
 
 1. `feat/p1-rest-notification`: notify when the rest timer ends while the app is in the background (`flutter_local_notifications` + `timezone`, Android 13+ notification permission, exact-alarm consideration). The in-app timer already vibrates when it ends.
 2. `feat/p1-settings-units`: kg/lb setting (weights are stored in kg), custom exercise creation UI (the repository already supports it), unsaved-changes prompt in the routine builder.
