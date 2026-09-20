@@ -45,17 +45,11 @@ Metrics? measurePushup(PoseFrame frame, BodySide side) {
     return null;
   }
 
-  final line = ankle - shoulder;
-  final length = line.length;
-  if (length == 0) return null;
-
-  // The unit vector perpendicular to the body line that points up the image.
-  var up = Vec2(line.y / length, -line.x / length);
-  if (up.y > 0) up = up * -1;
+  if (shoulder == ankle) return null;
 
   return {
     PushupMetric.elbowAngle: angleAt(shoulder, elbow, wrist),
-    PushupMetric.hipHeight: (hip - shoulder).dot(up) / length,
+    PushupMetric.hipHeight: heightAboveLine(hip, from: shoulder, to: ankle),
   };
 }
 

@@ -7,6 +7,7 @@ import 'package:formcoach/features/form_coach/engine/rep_scorer.dart';
 import 'package:formcoach/features/form_coach/exercises/registry.dart';
 import 'package:formcoach/features/form_coach/ui/set_summary.dart';
 import 'package:formcoach/features/form_coach/ui/skeleton_painter.dart';
+import 'package:formcoach/features/workout/workout_formatting.dart';
 import 'package:go_router/go_router.dart';
 
 /// Coaches one set: shows the body, counts reps, gives cues and, at the end,
@@ -35,9 +36,15 @@ class CoachSessionScreen extends ConsumerWidget {
       appBar: AppBar(title: Text(definition.name)),
       body: ListView(
         children: [
-          AspectRatio(aspectRatio: 1, child: _Preview(state: state)),
+          AspectRatio(
+            aspectRatio: 1,
+            child: _Preview(state: state, isHold: definition.isHold),
+          ),
           if (state.status == CoachStatus.finished)
-            SetSummary(reps: state.reps, partialCount: state.partialCount),
+            if (definition.isHold)
+              HoldSummary(holdTime: state.holdTime, score: state.holdScore)
+            else
+              SetSummary(reps: state.reps, partialCount: state.partialCount),
           if (state.status == CoachStatus.ready)
             const Padding(
               padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
@@ -101,9 +108,10 @@ class _Controls extends StatelessWidget {
 
 /// The dark picture area: skeleton, rep count, last score and current cue.
 class _Preview extends StatelessWidget {
-  const _Preview({required this.state});
+  const _Preview({required this.state, required this.isHold});
 
   final CoachState state;
+  final bool isHold;
 
   @override
   Widget build(BuildContext context) {
@@ -118,7 +126,9 @@ class _Preview extends StatelessWidget {
           CustomPaint(
             painter: SkeletonPainter(
               frame: tracking ? latest?.frame : null,
-              boneColor: theme.colorScheme.primary,
+              boneColor: (latest?.formValid ?? true)
+                  ? theme.colorScheme.primary
+                  : theme.colorScheme.error,
               jointColor: Colors.white,
             ),
           ),
@@ -126,10 +136,14 @@ class _Preview extends StatelessWidget {
             left: 16,
             top: 8,
             child: Semantics(
-              label: '${state.repCount} reps',
+              label: isHold
+                  ? '${state.holdTime.inSeconds} seconds'
+                  : '${state.repCount} reps',
               child: ExcludeSemantics(
                 child: Text(
-                  '${state.repCount}',
+                  isHold
+                      ? formatClock(state.holdTime.inSeconds)
+                      : '${state.repCount}',
                   style: theme.textTheme.displayLarge?.copyWith(
                     color: Colors.white,
                   ),

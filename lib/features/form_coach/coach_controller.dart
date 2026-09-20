@@ -29,6 +29,7 @@ class CoachState {
     this.reps = const [],
     this.partialCount = 0,
     this.cue,
+    this.holdScore,
   });
 
   final CoachStatus status;
@@ -43,13 +44,21 @@ class CoachState {
   /// The cue being shown right now, if any.
   final Cue? cue;
 
+  /// For hold exercises: the share of the time with good form (0 to 100).
+  final double? holdScore;
+
+  /// For hold exercises: how long good form has been held.
+  Duration get holdTime => latest?.holdTime ?? Duration.zero;
+
   int get repCount => reps.length;
 
   RepAnalysis? get lastRep => reps.isEmpty ? null : reps.last;
 
-  double? get setScore => reps.isEmpty
-      ? null
-      : reps.fold<double>(0, (sum, r) => sum + r.score) / reps.length;
+  double? get setScore =>
+      holdScore ??
+      (reps.isEmpty
+          ? null
+          : reps.fold<double>(0, (sum, r) => sum + r.score) / reps.length);
 
   CoachState copyWith({
     CoachStatus? status,
@@ -57,6 +66,7 @@ class CoachState {
     List<RepAnalysis>? reps,
     int? partialCount,
     Cue? cue,
+    double? holdScore,
     bool clearCue = false,
   }) => CoachState(
     status: status ?? this.status,
@@ -64,6 +74,7 @@ class CoachState {
     reps: reps ?? this.reps,
     partialCount: partialCount ?? this.partialCount,
     cue: clearCue ? null : cue ?? this.cue,
+    holdScore: holdScore ?? this.holdScore,
   );
 }
 
@@ -127,6 +138,7 @@ class CoachController extends Notifier<CoachState> {
       latest: update,
       reps: session.reps,
       partialCount: session.partialCount,
+      holdScore: session.holdScore,
     );
 
     final cue = update.cue;
