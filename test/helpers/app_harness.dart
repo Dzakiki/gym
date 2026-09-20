@@ -10,6 +10,8 @@ import 'package:formcoach/data/providers.dart';
 import 'package:formcoach/data/seed/exercise_seeder.dart';
 import 'package:formcoach/data/seed/seed_service.dart';
 import 'package:formcoach/data/seed/template_seeder.dart';
+import 'package:formcoach/features/settings/settings_providers.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'file_asset_bundle.dart';
 
@@ -21,6 +23,7 @@ void appTest(
   String description,
   Future<void> Function(WidgetTester tester, AppDatabase db) body, {
   List<Override> overrides = const [],
+  Map<String, Object> initialSettings = const {},
 }) {
   driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
 
@@ -49,9 +52,16 @@ void appTest(
       ).seedAll(),
     );
 
+    SharedPreferences.setMockInitialValues(initialSettings);
+    final preferences = await tester.runAsync(SharedPreferences.getInstance);
+
     await tester.pumpWidget(
       ProviderScope(
-        overrides: [appDatabaseProvider.overrideWithValue(db), ...overrides],
+        overrides: [
+          appDatabaseProvider.overrideWithValue(db),
+          sharedPreferencesProvider.overrideWithValue(preferences!),
+          ...overrides,
+        ],
         child: const FormCoachApp(),
       ),
     );

@@ -4,7 +4,9 @@ import 'package:formcoach/core/date_format.dart';
 import 'package:formcoach/core/widgets/empty_state.dart';
 import 'package:formcoach/data/providers.dart';
 import 'package:formcoach/data/repositories/workout_repository.dart';
+import 'package:formcoach/domain/weight_unit.dart';
 import 'package:formcoach/features/history/set_formatting.dart';
+import 'package:formcoach/features/settings/settings_providers.dart';
 import 'package:formcoach/features/workout/workout_formatting.dart';
 import 'package:formcoach/features/workout/workout_providers.dart';
 import 'package:go_router/go_router.dart';
@@ -43,7 +45,7 @@ class WorkoutDetailScreen extends ConsumerWidget {
                 title: 'Workout not found',
                 message: 'It may have been deleted.',
               )
-            : _Body(workout: item),
+            : _Body(workout: item, unit: ref.watch(weightUnitProvider)),
       ),
     );
   }
@@ -74,9 +76,10 @@ class WorkoutDetailScreen extends ConsumerWidget {
 }
 
 class _Body extends StatelessWidget {
-  const _Body({required this.workout});
+  const _Body({required this.workout, required this.unit});
 
   final ActiveWorkout workout;
+  final WeightUnit unit;
 
   @override
   Widget build(BuildContext context) {
@@ -107,7 +110,7 @@ class _Body extends StatelessWidget {
                 ),
               ),
             Chip(label: Text('${workout.completedSets} sets')),
-            if (volume > 0) Chip(label: Text(formatVolume(volume))),
+            if (volume > 0) Chip(label: Text(formatVolume(volume, unit: unit))),
           ],
         ),
         const SizedBox(height: 16),
@@ -128,7 +131,7 @@ class _Body extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 2),
                       child: Text(
-                        'Set ${set.setIndex + 1}:  ${formatSetLog(set)}',
+                        'Set ${set.setIndex + 1}:  ${formatSetLog(set, unit: unit)}',
                         style: theme.textTheme.bodyLarge,
                       ),
                     ),

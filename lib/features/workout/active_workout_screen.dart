@@ -8,6 +8,8 @@ import 'package:formcoach/core/widgets/empty_state.dart';
 import 'package:formcoach/data/local/app_database.dart';
 import 'package:formcoach/data/providers.dart';
 import 'package:formcoach/data/repositories/workout_repository.dart';
+import 'package:formcoach/domain/weight_unit.dart';
+import 'package:formcoach/features/settings/settings_providers.dart';
 import 'package:formcoach/features/workout/rest_banner.dart';
 import 'package:formcoach/features/workout/rest_timer.dart';
 import 'package:formcoach/features/workout/set_row.dart';
@@ -127,6 +129,7 @@ class _WorkoutView extends ConsumerWidget {
     // so grab what is needed afterwards before any await.
     final router = GoRouter.of(context);
     final dialogContext = Navigator.of(context, rootNavigator: true).context;
+    final unit = ref.read(weightUnitProvider);
     final done = workout.completedSets;
     final confirmed = await _confirm(
       context,
@@ -143,7 +146,7 @@ class _WorkoutView extends ConsumerWidget {
         .finishWorkout(workout.session.id);
     ref.read(restTimerProvider.notifier).skip();
     if (summary != null && dialogContext.mounted) {
-      await _showSummary(dialogContext, summary);
+      await _showSummary(dialogContext, summary, unit);
     }
     router.go(AppRoutes.workouts);
   }
@@ -191,7 +194,11 @@ class _WorkoutView extends ConsumerWidget {
     return result ?? false;
   }
 
-  Future<void> _showSummary(BuildContext context, WorkoutSummary summary) {
+  Future<void> _showSummary(
+    BuildContext context,
+    WorkoutSummary summary,
+    WeightUnit unit,
+  ) {
     return showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
@@ -203,7 +210,7 @@ class _WorkoutView extends ConsumerWidget {
             Text('Time: ${formatDuration(summary.duration)}'),
             Text('Sets: ${summary.completedSets}'),
             if (summary.volumeKg > 0)
-              Text('Volume: ${formatVolume(summary.volumeKg)}'),
+              Text('Volume: ${formatVolume(summary.volumeKg, unit: unit)}'),
           ],
         ),
         actions: [
