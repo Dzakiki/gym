@@ -9,6 +9,8 @@ import 'package:formcoach/features/form_coach/engine/rep_scorer.dart';
 import 'package:formcoach/features/form_coach/exercises/registry.dart';
 import 'package:formcoach/features/form_coach/pose/pose.dart';
 import 'package:formcoach/features/form_coach/pose/pose_source.dart';
+import 'package:formcoach/features/form_coach/tts_cue_player.dart';
+import 'package:formcoach/features/settings/settings_providers.dart';
 
 enum CoachStatus {
   /// Waiting for the athlete to start.
@@ -84,7 +86,12 @@ final poseSourceProvider = Provider<PoseSource>((ref) {
   return ReplayPoseSource(squatFrames(const SquatMotion(reps: 5)));
 });
 
-final cuePlayerProvider = Provider<CuePlayer>((ref) => const SilentCuePlayer());
+/// Speaks the coach's cues, or says nothing when spoken cues are switched off
+/// in the settings.
+final cuePlayerProvider = Provider<CuePlayer>((ref) {
+  if (!ref.watch(voiceCuesProvider)) return const SilentCuePlayer();
+  return TtsCuePlayer(FlutterTtsEngine());
+});
 
 /// Runs a coached set of the exercise with the given `coach_key`.
 class CoachController extends Notifier<CoachState> {

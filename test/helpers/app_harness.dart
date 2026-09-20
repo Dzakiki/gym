@@ -10,6 +10,8 @@ import 'package:formcoach/data/providers.dart';
 import 'package:formcoach/data/seed/exercise_seeder.dart';
 import 'package:formcoach/data/seed/seed_service.dart';
 import 'package:formcoach/data/seed/template_seeder.dart';
+import 'package:formcoach/features/form_coach/coach_controller.dart';
+import 'package:formcoach/features/form_coach/cue_player.dart';
 import 'package:formcoach/features/settings/settings_providers.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -60,6 +62,8 @@ void appTest(
         overrides: [
           appDatabaseProvider.overrideWithValue(db),
           sharedPreferencesProvider.overrideWithValue(preferences!),
+          // Never touch the real speech engine in tests.
+          cuePlayerProvider.overrideWithValue(const SilentCuePlayer()),
           ...overrides,
         ],
         child: const FormCoachApp(),
