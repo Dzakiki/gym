@@ -10,6 +10,7 @@ import 'package:formcoach/features/progress/progress_screen.dart';
 import 'package:formcoach/features/routines/routine_builder_screen.dart';
 import 'package:formcoach/features/routines/routine_detail_screen.dart';
 import 'package:formcoach/features/shell/shell_scaffold.dart';
+import 'package:formcoach/features/workout/active_workout_screen.dart';
 import 'package:formcoach/features/workouts/workouts_screen.dart';
 import 'package:go_router/go_router.dart';
 
@@ -79,6 +80,12 @@ final routerProvider = Provider<GoRouter>((ref) {
               ],
             ),
         ],
+      ),
+      // Full screen, above the tab bar, so nothing distracts while training.
+      GoRoute(
+        path: '/workout/:id',
+        builder: (context, state) =>
+            ActiveWorkoutScreen(workoutId: state.pathParameters['id']!),
       ),
     ],
   );

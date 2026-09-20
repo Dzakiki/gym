@@ -11,16 +11,17 @@ Read this first, then `IMPLEMENTATION_PLAN.md` for the full design.
 | Drift database schema | Merged (PR #3) |
 | Exercise library (50 seeded exercises, search, filters, detail) | Merged (PR #4) |
 | Program templates, routine repository, routine screens | Merged (PR #5) |
-| Routine builder (create, edit, reorder, targets, schedule) | In the latest PR (see `git log`) |
-| Active workout + rest timer | **Next** |
-| History | Not started |
+| Routine builder (create, edit, reorder, targets, schedule) | Merged (PR #6) |
+| Workout repository (log sets, finish, discard) | Merged (PR #7) |
+| Active workout screen + in-app rest timer | In the latest PR (see `git log`) |
+| History | **Next** |
 
 `main` is protected: PR required, checks `analyze-test` and `android-build` must pass, squash-merge only.
 
 ## Next features (one branch + PR each)
 
-1. `feat/p1-active-workout`: `WorkoutRepository` (start a session from a routine or empty, log sets, finish, discard), active workout screen (one card per exercise, set rows with reps and weight, check-off), rest timer with local notification (`flutter_local_notifications`, request notification permission on Android 13+), finish summary (duration, total sets). A "Start workout" button on the routine detail screen and Home.
-2. `feat/p1-history`: history list and session detail (sets per exercise).
+1. `feat/p1-rest-notification`: notify when the rest timer ends while the app is in the background (`flutter_local_notifications` + `timezone`, Android 13+ notification permission, exact-alarm consideration). The in-app timer already vibrates when it ends.
+2. `feat/p1-history` (do this first): history list and session detail (sets per exercise).
 3. `feat/p1-settings-units`: kg/lb setting (weights are stored in kg), custom exercise creation UI (the repository already supports it), unsaved-changes prompt in the routine builder.
 4. Tag `v0.1.0` (bump `pubspec.yaml` version in a PR, then `git tag v0.1.0 && git push --tags`).
 5. Phase 2 (camera + pose spike) **needs the Android phone plugged in with USB debugging on**.
@@ -63,6 +64,8 @@ Commit messages end with `Co-Authored-By: Claude Sonnet 5 <noreply@anthropic.com
 ## Gotchas
 
 - **Keep each bash command under about 6KB.** Longer commands were cut off with "unexpected EOF" parse errors. Write big files with the Write tool or in small batches.
+- Widget tests that wait on database work must use `settle(tester)` (test/helpers/app_harness.dart); `pumpAndSettle` alone returns immediately when no frame is scheduled.
+- Use one-shot queries (`get()`), not `watch().first`, for reads inside actions and transactions.
 - Python strings containing Windows paths need raw strings (`r"..."`).
 - `isNull` clashes between drift and flutter_test: `import 'package:drift/drift.dart' hide isNull;`.
 - In widget tests, `find.text('X')` also matches a search field containing X; use `widgetWithText(ListTile, 'X')`.

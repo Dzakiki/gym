@@ -153,6 +153,21 @@ void main() {
       expect(() => repo.updateSetWeight(setId, 1000.5), throwsArgumentError);
     });
 
+    test('duration can be set, cleared and is validated', () async {
+      final id = await repo.startWorkout(routineId: pushDayId);
+      final setId = (await load(id)).exercises.first.sets.first.id;
+
+      await repo.updateSetDuration(setId, 45);
+      expect((await load(id)).exercises.first.sets.first.durationSeconds, 45);
+      await repo.updateSetDuration(setId, null);
+      expect(
+        (await load(id)).exercises.first.sets.first.durationSeconds,
+        isNull,
+      );
+      expect(() => repo.updateSetDuration(setId, -1), throwsArgumentError);
+      expect(() => repo.updateSetDuration(setId, 3601), throwsArgumentError);
+    });
+
     test('updating an unknown set fails', () async {
       expect(() => repo.updateSetReps('missing', 5), throwsStateError);
     });

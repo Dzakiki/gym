@@ -4,6 +4,8 @@ import 'package:formcoach/app/routes.dart';
 import 'package:formcoach/data/local/app_database.dart';
 import 'package:formcoach/features/routines/routine_formatting.dart';
 import 'package:formcoach/features/routines/routine_providers.dart';
+import 'package:formcoach/features/workout/start_workout.dart';
+import 'package:formcoach/features/workout/workout_providers.dart';
 import 'package:go_router/go_router.dart';
 
 /// Entry point for routines, program templates and the exercise library.
@@ -16,6 +18,7 @@ class WorkoutsScreen extends ConsumerWidget {
       appBar: AppBar(title: const Text('Workouts')),
       body: ListView(
         children: [
+          const _WorkoutStatusTile(),
           ListTile(
             leading: const Icon(Icons.menu_book_outlined),
             title: const Text('Exercise library'),
@@ -40,6 +43,32 @@ class WorkoutsScreen extends ConsumerWidget {
           const _RoutineSection(templates: true),
         ],
       ),
+    );
+  }
+}
+
+/// Resumes the workout in progress, or starts an empty one.
+class _WorkoutStatusTile extends ConsumerWidget {
+  const _WorkoutStatusTile();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final active = ref.watch(activeSessionProvider).value;
+    if (active != null) {
+      return ListTile(
+        tileColor: Theme.of(context).colorScheme.primaryContainer,
+        leading: const Icon(Icons.timer_outlined),
+        title: const Text('Workout in progress'),
+        subtitle: Text(active.name),
+        trailing: const Text('Resume'),
+        onTap: () => context.go(AppRoutes.workout(active.id)),
+      );
+    }
+    return ListTile(
+      leading: const Icon(Icons.play_arrow_outlined),
+      title: const Text('Start empty workout'),
+      subtitle: const Text('Add exercises as you go'),
+      onTap: () => startWorkout(context, ref),
     );
   }
 }
