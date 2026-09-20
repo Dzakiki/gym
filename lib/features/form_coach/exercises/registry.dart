@@ -1,12 +1,13 @@
 import 'package:formcoach/features/form_coach/engine/exercise_definition.dart';
 import 'package:formcoach/features/form_coach/exercises/dip.dart';
 import 'package:formcoach/features/form_coach/exercises/plank.dart';
+import 'package:formcoach/features/form_coach/exercises/pullup.dart';
 import 'package:formcoach/features/form_coach/exercises/pushup.dart';
 import 'package:formcoach/features/form_coach/exercises/squat.dart';
 
 /// Every exercise the Form Coach supports, by `coach_key`.
 final Map<String, ExerciseDefinition> coachExercises = {
-  for (final definition in [squat, pushup, plank, dip])
+  for (final definition in [squat, pushup, plank, dip, pullup])
     definition.key: definition,
 };
 
