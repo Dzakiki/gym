@@ -165,7 +165,10 @@ void main() {
       }, overrides: [poseSourceProvider.overrideWithValue(source)]);
     }
 
-    coachTest('the Coach tab lists the squat', (tester, source) async {
+    coachTest('the Coach tab lists the supported exercises', (
+      tester,
+      source,
+    ) async {
       await tester.tap(
         find.descendant(
           of: find.byType(NavigationBar),
@@ -175,7 +178,8 @@ void main() {
       await settle(tester);
 
       expect(find.text('Squat'), findsOneWidget);
-      expect(find.text('Film yourself from the side'), findsOneWidget);
+      expect(find.text('Push-up'), findsOneWidget);
+      expect(find.text('Film yourself from the side'), findsWidgets);
     });
 
     coachTest('opens ready to start, in demo mode', (tester, source) async {
@@ -262,7 +266,10 @@ void main() {
       await settle(tester);
       await tester.tap(find.text('Done'));
       await settle(tester);
-      expect(find.text('Film yourself from the side'), findsOneWidget);
+      expect(
+        find.text('Pick an exercise to get live feedback on your form.'),
+        findsOneWidget,
+      );
     });
   });
 }

@@ -44,6 +44,9 @@ class CoachUpdate {
 /// Coaches one set of one exercise: feed it camera frames in order and it
 /// counts repetitions, judges each one and decides what to tell the athlete.
 class CoachSession {
+  /// About a third of a second of frames at 30 fps.
+  static const _leadInFrames = 10;
+
   CoachSession({
     required this.definition,
     LandmarkSmoother? smoother,
@@ -68,6 +71,10 @@ class CoachSession {
   BodySide? _side;
   Duration? _lastTracked;
   _RepCollector? _collector;
+
+  /// The last few frames spent at the top, so a repetition's statistics also
+  /// cover how the athlete started (e.g. arms fully locked out).
+  final _leadIn = <Metrics>[];
 
   /// Analyses of the completed repetitions, in order.
   List<RepAnalysis> get reps => List.unmodifiable(_reps);
@@ -95,7 +102,7 @@ class CoachSession {
     _lastTracked = time;
 
     final event = _machine.update(metrics[definition.primaryMetric]!, time);
-    _collect(metrics, time);
+    _collect(metrics);
 
     RepAnalysis? completed;
     var partial = false;
@@ -133,6 +140,7 @@ class CoachSession {
     _side = null;
     _lastTracked = null;
     _collector = null;
+    _leadIn.clear();
   }
 
   bool get _isAtRest =>
@@ -166,9 +174,19 @@ class CoachSession {
     );
   }
 
-  void _collect(Metrics metrics, Duration time) {
-    if (_isAtRest) return;
-    (_collector ??= _RepCollector(definition.primaryMetric)).add(metrics);
+  void _collect(Metrics metrics) {
+    if (_isAtRest) {
+      _leadIn.add(metrics);
+      if (_leadIn.length > _leadInFrames) _leadIn.removeAt(0);
+      return;
+    }
+    var collector = _collector;
+    if (collector == null) {
+      collector = _collector = _RepCollector(definition.primaryMetric);
+      _leadIn.forEach(collector.add);
+      _leadIn.clear();
+    }
+    collector.add(metrics);
   }
 
   RepSummary _summarise(RepCompleted event) {

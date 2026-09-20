@@ -32,7 +32,7 @@ class CoachScreen extends StatelessWidget {
             ),
           const Padding(
             padding: EdgeInsets.all(16),
-            child: Text('Push-up, lunge, plank and jumping jack are coming.'),
+            child: Text('More exercises are coming.'),
           ),
         ],
       ),
