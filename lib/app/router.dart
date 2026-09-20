@@ -4,6 +4,7 @@ import 'package:formcoach/app/app_tab.dart';
 import 'package:formcoach/features/coach/coach_screen.dart';
 import 'package:formcoach/features/exercises/exercise_detail_screen.dart';
 import 'package:formcoach/features/exercises/exercise_library_screen.dart';
+import 'package:formcoach/features/form_coach/ui/coach_session_screen.dart';
 import 'package:formcoach/features/history/workout_detail_screen.dart';
 import 'package:formcoach/features/home/home_screen.dart';
 import 'package:formcoach/features/profile/profile_screen.dart';
@@ -88,6 +89,12 @@ final routerProvider = Provider<GoRouter>((ref) {
               ],
             ),
         ],
+      ),
+      // Full screen, above the tab bar, so the whole picture is visible.
+      GoRoute(
+        path: '/coach-session/:key',
+        builder: (context, state) =>
+            CoachSessionScreen(coachKey: state.pathParameters['key']!),
       ),
       // Full screen, above the tab bar, so nothing distracts while training.
       GoRoute(

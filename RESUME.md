@@ -19,7 +19,8 @@ Read this first, then `IMPLEMENTATION_PLAN.md` for the full design.
 | Form Coach: `RepStateMachine` and `HoldTimer` | Merged (PR #11) |
 | Form Coach: `FormRule`, `RepScorer`, `CueManager` | Merged (PR #12) |
 | Form Coach: `CoachSession`, `ExerciseDefinition`, squat, synthetic pose generator | Merged (PR #13) |
-| Form Coach: `CoachController`, `PoseSource`/`ReplayPoseSource`, `CuePlayer`, exercise registry | In the latest PR (see `git log`) |
+| Form Coach: `CoachController`, `PoseSource`/`ReplayPoseSource`, `CuePlayer`, exercise registry | Merged (PR #14) |
+| Form Coach screen: skeleton overlay, live counter, score chip, cue banner, set summary, Coach tab (demo source) | In the latest PR (see `git log`) |
 
 `main` is protected: PR required, checks `analyze-test` and `android-build` must pass, squash-merge only.
 
@@ -29,7 +30,7 @@ Form Coach engine (pure Dart, no phone needed; build in this order, test with sy
 
 - The squat is the template: see `lib/features/form_coach/exercises/squat.dart` (metrics, limits, rules) and `lib/features/form_coach/demo/pose_synth.dart` (generates squat frames from joint angles; extend it with push-up, lunge, plank and jumping-jack poses).
 - Push-up, lunge, plank (uses `HoldTimer`, needs a hold-mode session), jumping jack (front view) definitions, one PR each. Squat heel-lift rule is still missing (needs a heel baseline).
-- Coach screen UI (do this next, it needs no camera): skeleton painter, HUD with rep counter, per-rep score chip and cue banner, start/stop, set summary (per-rep bars, top faults), entry from the Coach tab and from the active workout. It runs on the demo `poseSourceProvider` (simulated squats); the real camera source replaces that provider later.
+- Save a coached set into the workout: a `coach_analyses` table (schema in section 6 of the plan), a "Start with AI Coach" button on coach-supported exercises in the active workout that fills reps and marks the set `coached`, and a form-score trend on the Progress tab.
 - TTS: implement `CuePlayer` with `flutter_tts` and override `cuePlayerProvider` (needs a real device to check).
 - Camera pipeline (needs the phone): `camera` image stream, ML Kit detector implementing a `PoseSource`, coordinate mapping to image-height units, permission flow.
 
