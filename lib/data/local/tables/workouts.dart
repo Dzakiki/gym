@@ -26,6 +26,11 @@ class SetLogs extends Table with SyncColumns {
   TextColumn get sessionId =>
       text().references(WorkoutSessions, #id, onDelete: KeyAction.cascade)();
   TextColumn get exerciseId => text().references(Exercises, #id)();
+
+  /// Position of the exercise within the workout (0 = first).
+  IntColumn get exerciseOrder => integer().withDefault(const Constant(0))();
+
+  /// Position of the set within its exercise (0 = first).
   IntColumn get setIndex => integer()();
   IntColumn get reps => integer().nullable()();
   RealColumn get weightKg => real().nullable()();
