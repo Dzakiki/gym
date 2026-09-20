@@ -16,7 +16,8 @@ Read this first, then `IMPLEMENTATION_PLAN.md` for the full design.
 | Active workout screen + in-app rest timer | Merged (PR #8) |
 | History (Progress tab list + workout detail + delete) | Merged (PR #9) |
 | Form Coach: geometry, One Euro filter, landmark smoother (pure Dart, `lib/features/form_coach/`) | Merged (PR #10) |
-| Form Coach: `RepStateMachine` and `HoldTimer` | In the latest PR (see `git log`) |
+| Form Coach: `RepStateMachine` and `HoldTimer` | Merged (PR #11) |
+| Form Coach: `FormRule`, `RepScorer`, `CueManager` | In the latest PR (see `git log`) |
 
 `main` is protected: PR required, checks `analyze-test` and `android-build` must pass, squash-merge only.
 
@@ -24,7 +25,7 @@ Read this first, then `IMPLEMENTATION_PLAN.md` for the full design.
 
 Form Coach engine (pure Dart, no phone needed; build in this order, test with synthetic pose sequences):
 
-- `feat/p3-coach-session`: `FormRule`, `RepScorer`, `CueManager` (priority, cooldowns, "2 of last 3 reps" rule), `CoachSession` orchestrator, a synthetic pose generator for tests, and the squat `ExerciseDefinition`. See section 4 of `IMPLEMENTATION_PLAN.md` for thresholds.
+- `feat/p3-coach-session`: `ExerciseDefinition` (view, per-frame `measure` to `Metrics`, primary metric, `RepMachineConfig`, rules, partial-rep cue text), `CoachSession` orchestrator (smoother, side selection, per-rep `RepSummary` collector, scorer, cue manager, pose-lost handling, set score), a synthetic side-view pose generator as a test helper (forward kinematics: ankle fixed, knee/hip/shoulder from knee angle, shin lean and torso lean), and the squat definition (depth, torso lean, knee over toe, tempo; heel lift needs a baseline). Thresholds are in section 4 of `IMPLEMENTATION_PLAN.md`.
 - Then push-up, lunge, plank, jumping jack definitions, one PR each.
 
 Workout tracking leftovers:
