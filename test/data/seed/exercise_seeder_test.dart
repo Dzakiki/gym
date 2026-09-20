@@ -7,6 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:formcoach/data/local/app_database.dart';
 import 'package:formcoach/data/seed/exercise_seeder.dart';
 import 'package:formcoach/domain/enums.dart';
+import 'package:formcoach/features/form_coach/exercises/registry.dart';
 
 import '../../helpers/file_asset_bundle.dart';
 
@@ -63,7 +64,6 @@ void main() {
 
   group('seed file', () {
     late List<Map<String, dynamic>> entries;
-    const coachKeys = {'squat', 'pushup', 'lunge', 'plank', 'jumping_jack'};
 
     setUpAll(() {
       final json = File(ExerciseSeeder.assetPath).readAsStringSync();
@@ -108,13 +108,13 @@ void main() {
       }
     });
 
-    test('exactly the five Form Coach exercises have a coach key', () {
+    test('coach keys match the exercises the coach can judge', () {
       final keys = entries
           .map((e) => e['coachKey'])
           .whereType<String>()
           .toSet();
 
-      expect(keys, coachKeys);
+      expect(keys, coachExercises.keys.toSet());
     });
   });
 }

@@ -33,7 +33,7 @@
       "quadriceps",
       "glutes"
     ],
-    "coachKey": "lunge",
+    "coachKey": null,
     "instructions": "Step forward and lower until both knees are about 90 degrees, keep your torso upright, then push back to standing."
   },
   {
@@ -55,7 +55,7 @@
     "primaryMuscles": [
       "fullBody"
     ],
-    "coachKey": "jumping_jack",
+    "coachKey": null,
     "instructions": "Jump your feet wide while raising both arms overhead, then jump back to the start."
   },
   {
@@ -588,5 +588,18 @@
     ],
     "coachKey": null,
     "instructions": "In a half-kneeling position, tuck your pelvis and shift forward until you feel a stretch at the front of the hip."
+  },
+  {
+    "slug": "dip",
+    "name": "Dip",
+    "category": "strength",
+    "equipment": "bodyweight",
+    "primaryMuscles": [
+      "triceps",
+      "chest",
+      "shoulders"
+    ],
+    "coachKey": "dip",
+    "instructions": "Support yourself on parallel bars or two sturdy chairs with straight arms, lower until your upper arms are level with the floor, then press back up."
   }
 ]
