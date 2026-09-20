@@ -1,10 +1,9 @@
-import 'dart:async';
-
 import 'package:drift/drift.dart';
 import 'package:formcoach/core/clock.dart';
 import 'package:formcoach/core/ids.dart';
 import 'package:formcoach/data/local/app_database.dart';
 import 'package:formcoach/data/repositories/routine_draft.dart';
+import 'package:formcoach/data/repositories/watch_load.dart';
 
 /// One exercise of a routine together with the exercise it refers to.
 class RoutineItem {
@@ -45,39 +44,15 @@ class RoutineRepository {
   /// The routine with [id] and its exercises, or null if it does not exist.
   /// Emits again whenever the routine, its exercises or the exercise
   /// library change.
-  Stream<RoutineDetail?> watchDetail(String id) {
-    late final StreamController<RoutineDetail?> controller;
-    StreamSubscription<void>? updates;
-
-    Future<void> emit() async {
-      try {
-        final detail = await getDetail(id);
-        if (!controller.isClosed) controller.add(detail);
-      } on Object catch (error, stackTrace) {
-        if (!controller.isClosed) controller.addError(error, stackTrace);
-      }
-    }
-
-    controller = StreamController<RoutineDetail?>(
-      onListen: () {
-        unawaited(emit());
-        updates = _database
-            .tableUpdates(
-              TableUpdateQuery.onAllTables([
-                _database.routines,
-                _database.routineExercises,
-                _database.exercises,
-              ]),
-            )
-            .listen((_) => unawaited(emit()));
-      },
-      onCancel: () async {
-        await updates?.cancel();
-        await controller.close();
-      },
-    );
-    return controller.stream;
-  }
+  Stream<RoutineDetail?> watchDetail(String id) => watchLoad(
+    database: _database,
+    tables: [
+      _database.routines,
+      _database.routineExercises,
+      _database.exercises,
+    ],
+    load: () => getDetail(id),
+  );
 
   /// Loads the routine with [id] and its exercises once.
   Future<RoutineDetail?> getDetail(String id) async {
