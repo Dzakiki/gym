@@ -2,6 +2,8 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:formcoach/app/app_tab.dart';
 import 'package:formcoach/features/coach/coach_screen.dart';
+import 'package:formcoach/features/exercises/exercise_detail_screen.dart';
+import 'package:formcoach/features/exercises/exercise_library_screen.dart';
 import 'package:formcoach/features/home/home_screen.dart';
 import 'package:formcoach/features/profile/profile_screen.dart';
 import 'package:formcoach/features/progress/progress_screen.dart';
@@ -18,6 +20,24 @@ Widget _screenFor(AppTab tab) => switch (tab) {
   AppTab.profile => const ProfileScreen(),
 };
 
+/// Screens pushed on top of a tab's root screen.
+List<RouteBase> _subRoutesFor(AppTab tab) => switch (tab) {
+  AppTab.workouts => [
+    GoRoute(
+      path: 'exercises',
+      builder: (context, state) => const ExerciseLibraryScreen(),
+      routes: [
+        GoRoute(
+          path: ':id',
+          builder: (context, state) =>
+              ExerciseDetailScreen(exerciseId: state.pathParameters['id']!),
+        ),
+      ],
+    ),
+  ],
+  _ => const [],
+};
+
 final routerProvider = Provider<GoRouter>((ref) {
   final router = GoRouter(
     initialLocation: AppTab.home.path,
@@ -32,6 +52,7 @@ final routerProvider = Provider<GoRouter>((ref) {
                 GoRoute(
                   path: tab.path,
                   builder: (context, state) => _screenFor(tab),
+                  routes: _subRoutesFor(tab),
                 ),
               ],
             ),

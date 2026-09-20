@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:formcoach/core/widgets/empty_state.dart';
+import 'package:formcoach/app/routes.dart';
+import 'package:go_router/go_router.dart';
 
 class WorkoutsScreen extends StatelessWidget {
   const WorkoutsScreen({super.key});
@@ -8,10 +9,16 @@ class WorkoutsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Workouts')),
-      body: const EmptyState(
-        icon: Icons.fitness_center,
-        title: 'Workouts',
-        message: 'Routines and the exercise library will live here.',
+      body: ListView(
+        children: [
+          ListTile(
+            leading: const Icon(Icons.menu_book_outlined),
+            title: const Text('Exercise library'),
+            subtitle: const Text('Browse and search every exercise'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => context.push(AppRoutes.exerciseLibrary),
+          ),
+        ],
       ),
     );
   }
