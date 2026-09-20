@@ -2,6 +2,7 @@
 abstract final class AppRoutes {
   static const workouts = '/workouts';
   static const exerciseLibrary = '/workouts/exercises';
+  static const newExercise = '/workouts/exercises/new';
   static const pickExercise = '/workouts/pick-exercise';
   static const routines = '/workouts/routines';
   static const newRoutine = '/workouts/routines/new';

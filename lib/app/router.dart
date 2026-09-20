@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:formcoach/app/app_tab.dart';
 import 'package:formcoach/features/coach/coach_screen.dart';
 import 'package:formcoach/features/exercises/exercise_detail_screen.dart';
+import 'package:formcoach/features/exercises/exercise_form_screen.dart';
 import 'package:formcoach/features/exercises/exercise_library_screen.dart';
 import 'package:formcoach/features/form_coach/ui/coach_session_screen.dart';
 import 'package:formcoach/features/history/workout_detail_screen.dart';
@@ -32,6 +33,11 @@ List<RouteBase> _subRoutesFor(AppTab tab) => switch (tab) {
       path: 'exercises',
       builder: (context, state) => const ExerciseLibraryScreen(),
       routes: [
+        // 'new' must come before ':id' so it is not read as an id.
+        GoRoute(
+          path: 'new',
+          builder: (context, state) => const ExerciseFormScreen(),
+        ),
         GoRoute(
           path: ':id',
           builder: (context, state) =>

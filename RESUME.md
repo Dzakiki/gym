@@ -30,7 +30,8 @@ Read this first, then `IMPLEMENTATION_PLAN.md` for the full design.
 | Settings: kg/lb and spoken-cue switch, Profile screen | Merged (PR #24) |
 | Coached sets saved into workouts (`coach_analyses`, schema v2 migration), Start with AI Coach | Merged (PR #25) |
 | Home screen (streak, today's routine, resume) | Merged (PR #26) |
-| Progress: weekly volume chart, form-score chart, personal records | In the latest PR (see `git log`) |
+| Progress: weekly volume chart, form-score chart, personal records | Merged (PR #27) |
+| Custom exercises (create in the library, delete your own) | In the latest PR (see `git log`) |
 
 `main` is protected: PR required, checks `analyze-test` and `android-build` must pass, squash-merge only.
 
@@ -46,7 +47,7 @@ Form Coach engine (pure Dart, no phone needed; build in this order, test with sy
 Workout tracking leftovers:
 
 1. `feat/p1-rest-notification`: notify when the rest timer ends while the app is in the background (`flutter_local_notifications` + `timezone`, Android 13+ notification permission, exact-alarm consideration). The in-app timer already vibrates when it ends.
-2. Custom exercise creation UI (the repository already supports it) and an unsaved-changes prompt in the routine builder. (kg/lb is done.)
+2. An unsaved-changes prompt in the routine builder. (kg/lb and custom exercises are done.)
 3. Tag `v0.1.0` (bump `pubspec.yaml` version in a PR, then `git tag v0.1.0 && git push --tags`).
 4. Phase 2 (camera + pose spike) **needs the Android phone plugged in with USB debugging on**.
 

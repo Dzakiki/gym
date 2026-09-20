@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:formcoach/core/widgets/empty_state.dart';
 import 'package:formcoach/data/local/app_database.dart';
+import 'package:formcoach/data/providers.dart';
 import 'package:formcoach/domain/enum_labels.dart';
 import 'package:formcoach/features/exercises/exercise_providers.dart';
+import 'package:go_router/go_router.dart';
 
 /// Shows how to perform one exercise.
 class ExerciseDetailScreen extends ConsumerWidget {
@@ -11,11 +13,48 @@ class ExerciseDetailScreen extends ConsumerWidget {
 
   final String exerciseId;
 
+  Future<void> _confirmDelete(BuildContext context, WidgetRef ref) async {
+    final router = GoRouter.of(context);
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete exercise?'),
+        content: const Text(
+          'It will be removed from the library. Workouts you already logged '
+          'keep it.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    await ref.read(exerciseRepositoryProvider).deleteCustom(exerciseId);
+    router.pop();
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final exercise = ref.watch(exerciseByIdProvider(exerciseId));
     return Scaffold(
-      appBar: AppBar(title: Text(exercise.value?.name ?? 'Exercise')),
+      appBar: AppBar(
+        title: Text(exercise.value?.name ?? 'Exercise'),
+        actions: [
+          if (exercise.value?.isCustom ?? false)
+            IconButton(
+              icon: const Icon(Icons.delete_outline),
+              tooltip: 'Delete exercise',
+              onPressed: () => _confirmDelete(context, ref),
+            ),
+        ],
+      ),
       body: exercise.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, stack) => const EmptyState(

@@ -24,6 +24,11 @@ class ExerciseLibraryScreen extends ConsumerWidget {
       appBar: AppBar(
         title: Text(selectMode ? 'Choose an exercise' : 'Exercise library'),
       ),
+      floatingActionButton: FloatingActionButton.extended(
+        icon: const Icon(Icons.add),
+        label: const Text('New exercise'),
+        onPressed: () => context.push(AppRoutes.newExercise),
+      ),
       body: Column(
         children: [
           const _SearchField(),
@@ -121,7 +126,8 @@ class _ExerciseList extends StatelessWidget {
         return ListTile(
           title: Text(exercise.name),
           subtitle: Text(
-            '${exercise.category.label}, ${exercise.equipment.label}',
+            '${exercise.category.label}, ${exercise.equipment.label}'
+            '${exercise.isCustom ? ', custom' : ''}',
           ),
           trailing: exercise.coachKey == null
               ? null
