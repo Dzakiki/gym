@@ -1,6 +1,7 @@
 import 'package:formcoach/features/form_coach/engine/body_side.dart';
 import 'package:formcoach/features/form_coach/engine/cue_manager.dart';
 import 'package:formcoach/features/form_coach/engine/exercise_definition.dart';
+import 'package:formcoach/features/form_coach/engine/hold_timer.dart';
 import 'package:formcoach/features/form_coach/engine/landmark_smoother.dart';
 import 'package:formcoach/features/form_coach/engine/rep_scorer.dart';
 import 'package:formcoach/features/form_coach/engine/rep_state_machine.dart';
@@ -17,6 +18,8 @@ class CoachUpdate {
     this.completedRep,
     this.partialRep = false,
     this.cue,
+    this.holdTime,
+    this.formValid,
   });
 
   /// The frame after smoothing and dropping unreliable landmarks.
@@ -39,6 +42,12 @@ class CoachUpdate {
 
   /// Something to say or show right now, if anything.
   final Cue? cue;
+
+  /// For hold exercises: how long good form has been held so far.
+  final Duration? holdTime;
+
+  /// For hold exercises: whether the form in this frame was good.
+  final bool? formValid;
 }
 
 /// Coaches one set of one exercise: feed it camera frames in order and it
@@ -72,6 +81,10 @@ class CoachSession {
   Duration? _lastTracked;
   _RepCollector? _collector;
 
+  // Hold mode (e.g. plank).
+  final _holdTimer = HoldTimer();
+  final _violationSince = <String, Duration>{};
+
   /// The last few frames spent at the top, so a repetition's statistics also
   /// cover how the athlete started (e.g. arms fully locked out).
   final _leadIn = <Metrics>[];
@@ -87,10 +100,24 @@ class CoachSession {
   /// The side of the body being measured, once known.
   BodySide? get side => _side;
 
-  /// The average score of the completed repetitions, or null if there are none.
-  double? get setScore => _reps.isEmpty
-      ? null
-      : _reps.fold<double>(0, (sum, r) => sum + r.score) / _reps.length;
+  /// How long good form was held (hold exercises only).
+  Duration get holdTime => _holdTimer.held;
+
+  /// The share of the time in position that had good form, from 0 to 100, or
+  /// null before any time has been measured (hold exercises only).
+  double? get holdScore {
+    final total = _holdTimer.held + _holdTimer.brokenForm;
+    if (total == Duration.zero) return null;
+    return _holdTimer.held.inMicroseconds / total.inMicroseconds * 100;
+  }
+
+  /// The score of the set: the average of the completed repetitions, or the
+  /// share of good form for a hold. Null if nothing was measured.
+  double? get setScore {
+    if (definition.isHold) return holdScore;
+    if (_reps.isEmpty) return null;
+    return _reps.fold<double>(0, (sum, r) => sum + r.score) / _reps.length;
+  }
 
   /// Processes one camera frame.
   CoachUpdate update(PoseFrame rawFrame) {
@@ -100,6 +127,7 @@ class CoachSession {
 
     if (metrics == null) return _notTracking(frame, time);
     _lastTracked = time;
+    if (definition.isHold) return _updateHold(frame, metrics, time);
 
     final event = _machine.update(metrics[definition.primaryMetric]!, time);
     _collect(metrics);
@@ -141,6 +169,8 @@ class CoachSession {
     _lastTracked = null;
     _collector = null;
     _leadIn.clear();
+    _holdTimer.reset();
+    _violationSince.clear();
   }
 
   bool get _isAtRest =>
@@ -163,6 +193,57 @@ class CoachSession {
     return null;
   }
 
+  CoachUpdate _updateHold(PoseFrame frame, Metrics metrics, Duration time) {
+    final spec = definition.hold!;
+    final violated = [
+      for (final check in spec.checks)
+        if (check.isViolated(metrics)) check,
+    ];
+    final valid = violated.isEmpty;
+    final before = _holdTimer.held;
+    _holdTimer.update(valid: valid, time: time);
+
+    final violatedCodes = {for (final check in violated) check.code};
+    _violationSince.removeWhere((code, _) => !violatedCodes.contains(code));
+    for (final check in violated) {
+      _violationSince.putIfAbsent(check.code, () => time);
+    }
+
+    Cue? cue;
+    for (final check in violated) {
+      if (time - _violationSince[check.code]! < spec.violationDelay) continue;
+      cue = _cues.request(
+        check.code,
+        check.cue,
+        check.safety ? CueKind.safety : CueKind.correction,
+        time,
+      );
+      if (cue != null) break;
+    }
+    final held = _holdTimer.held;
+    final every = spec.milestoneEvery.inMilliseconds;
+    if (cue == null &&
+        held.inMilliseconds ~/ every > before.inMilliseconds ~/ every) {
+      final seconds = held.inSeconds;
+      cue = _cues.request(
+        'milestone_$seconds',
+        '$seconds seconds, keep going',
+        CueKind.encouragement,
+        time,
+      );
+    }
+
+    return CoachUpdate(
+      frame: frame,
+      tracking: true,
+      phase: _machine.phase,
+      metrics: metrics,
+      cue: cue,
+      holdTime: held,
+      formValid: valid,
+    );
+  }
+
   CoachUpdate _notTracking(PoseFrame frame, Duration time) {
     final lastTracked = _lastTracked ?? Duration.zero;
     final lost = time - lastTracked > lostAfter;
@@ -171,6 +252,7 @@ class CoachSession {
       tracking: !lost,
       phase: _machine.phase,
       cue: lost ? _cues.onPoseLost(time) : null,
+      holdTime: definition.isHold ? _holdTimer.held : null,
     );
   }
 

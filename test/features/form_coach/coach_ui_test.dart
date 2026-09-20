@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:formcoach/features/form_coach/coach_controller.dart';
+import 'package:formcoach/features/form_coach/demo/plank_synth.dart';
 import 'package:formcoach/features/form_coach/demo/pose_synth.dart';
 import 'package:formcoach/features/form_coach/engine/form_rule.dart';
 import 'package:formcoach/features/form_coach/engine/geometry.dart';
@@ -33,8 +34,9 @@ Fault _fault(String code, String cue, {double deduction = 10}) =>
 
 Future<ControlledPoseSource> _openSquatCoach(
   WidgetTester tester,
-  ControlledPoseSource source,
-) async {
+  ControlledPoseSource source, {
+  String exercise = 'Squat',
+}) async {
   await tester.tap(
     find.descendant(
       of: find.byType(NavigationBar),
@@ -42,7 +44,7 @@ Future<ControlledPoseSource> _openSquatCoach(
     ),
   );
   await settle(tester);
-  await tester.tap(find.text('Squat'));
+  await tester.tap(find.text(exercise));
   await settle(tester);
   return source;
 }
@@ -151,6 +153,36 @@ void main() {
     });
   });
 
+  group('hold summary', () {
+    testWidgets('shows the time held and the share of good form', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: HoldSummary(holdTime: Duration(seconds: 42), score: 85),
+          ),
+        ),
+      );
+
+      expect(find.text('42 s'), findsOneWidget);
+      expect(find.text('held with good form'), findsOneWidget);
+      expect(find.textContaining('85%'), findsOneWidget);
+    });
+
+    testWidgets('says so when nothing was measured', (tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: HoldSummary(holdTime: Duration.zero, score: null),
+          ),
+        ),
+      );
+
+      expect(find.text('No time was measured.'), findsOneWidget);
+    });
+  });
+
   group('coach screens', () {
     /// Runs [body] with a pose source it can push frames into.
     void coachTest(
@@ -179,6 +211,7 @@ void main() {
 
       expect(find.text('Squat'), findsOneWidget);
       expect(find.text('Push-up'), findsOneWidget);
+      expect(find.text('Plank'), findsOneWidget);
       expect(find.text('Film yourself from the side'), findsWidgets);
     });
 
@@ -270,6 +303,56 @@ void main() {
         find.text('Pick an exercise to get live feedback on your form.'),
         findsOneWidget,
       );
+    });
+    coachTest('a plank shows a timer instead of a rep counter', (
+      tester,
+      source,
+    ) async {
+      await _openSquatCoach(tester, source, exercise: 'Plank');
+      await _start(tester);
+
+      source.addAll(plankFrames(length: const Duration(seconds: 12)));
+      await tester.pump(const Duration(milliseconds: 50));
+
+      expect(find.text('0:11'), findsOneWidget);
+      expect(find.textContaining('Rep '), findsNothing);
+    });
+
+    coachTest('sagging hips in a plank show a cue', (tester, source) async {
+      await _openSquatCoach(tester, source, exercise: 'Plank');
+      await _start(tester);
+
+      source.addAll(
+        plankFrames(
+          length: const Duration(seconds: 8),
+          deviations: const [
+            PlankDeviation(
+              from: Duration(seconds: 2),
+              to: Duration(seconds: 8),
+              hipOffset: -0.12,
+            ),
+          ],
+        ),
+      );
+      await tester.pump(const Duration(milliseconds: 50));
+
+      expect(find.text('Hips up'), findsOneWidget);
+    });
+
+    coachTest('stopping a plank shows how long good form was held', (
+      tester,
+      source,
+    ) async {
+      await _openSquatCoach(tester, source, exercise: 'Plank');
+      await _start(tester);
+      source.addAll(plankFrames(length: const Duration(seconds: 12)));
+      await tester.pump(const Duration(milliseconds: 50));
+
+      await tester.tap(find.text('Stop'));
+      await settle(tester);
+
+      expect(find.text('held with good form'), findsOneWidget);
+      expect(find.textContaining('100%'), findsOneWidget);
     });
   });
 }

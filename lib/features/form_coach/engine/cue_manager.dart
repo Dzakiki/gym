@@ -96,18 +96,24 @@ class CueManager {
     return null;
   }
 
+  /// Asks to give a cue that is not tied to a completed repetition (for
+  /// example while holding a plank). It is given only if the same cue and any
+  /// cue at all are not too recent. Safety cues ignore the gap between cues.
+  Cue? request(String code, String text, CueKind kind, Duration time) {
+    if (!_allowed(code, time, safety: kind == CueKind.safety)) return null;
+    return _give(code, text, kind, time);
+  }
+
   /// Call when an attempt went down but did not reach the bottom.
   Cue? onPartialRep(String text, Duration time) {
-    if (!_allowed(partialRepCode, time, safety: false)) return null;
-    _goodStreak = 0;
-    return _give(partialRepCode, text, CueKind.correction, time);
+    final cue = request(partialRepCode, text, CueKind.correction, time);
+    if (cue != null) _goodStreak = 0;
+    return cue;
   }
 
   /// Call when the athlete is out of view or too far away.
-  Cue? onPoseLost(Duration time) {
-    if (!_allowed(poseLostCode, time, safety: false)) return null;
-    return _give(poseLostCode, 'Step back into view', CueKind.info, time);
-  }
+  Cue? onPoseLost(Duration time) =>
+      request(poseLostCode, 'Step back into view', CueKind.info, time);
 
   /// Forgets everything, e.g. when a new set starts.
   void reset() {

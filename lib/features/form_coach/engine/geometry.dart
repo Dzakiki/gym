@@ -60,3 +60,19 @@ double leanFromVertical(Vec2 from, Vec2 to) {
   final cosine = (segment.dot(up) / segment.length).clamp(-1.0, 1.0);
   return math.acos(cosine) * 180 / math.pi;
 }
+
+/// How far [point] is above the straight line from [from] to [to], as a
+/// fraction of the length of that line. Positive means above (towards the top
+/// of the image), negative means below. Returns 0 if the line has no length.
+///
+/// Used to check whether hips sag or pike relative to the shoulder-ankle line.
+double heightAboveLine(Vec2 point, {required Vec2 from, required Vec2 to}) {
+  final line = to - from;
+  final length = line.length;
+  if (length == 0) return 0;
+
+  // The unit vector perpendicular to the line that points up the image.
+  var up = Vec2(line.y / length, -line.x / length);
+  if (up.y > 0) up = up * -1;
+  return (point - from).dot(up) / length;
+}

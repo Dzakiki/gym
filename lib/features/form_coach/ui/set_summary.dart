@@ -171,3 +171,48 @@ class _Bar extends StatelessWidget {
     );
   }
 }
+
+/// The results of a finished hold (such as a plank): time held with good form
+/// and the share of the time the form was good.
+class HoldSummary extends StatelessWidget {
+  const HoldSummary({required this.holdTime, required this.score, super.key});
+
+  final Duration holdTime;
+
+  /// From 0 to 100, or null if nothing was measured.
+  final double? score;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final score = this.score;
+    if (score == null) {
+      return Padding(
+        padding: const EdgeInsets.all(16),
+        child: Text('No time was measured.', style: theme.textTheme.bodyLarge),
+      );
+    }
+    final quality = RepQuality.fromScore(score);
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '${holdTime.inSeconds} s',
+            style: theme.textTheme.displayMedium?.copyWith(
+              color: qualityColor(quality, theme.colorScheme),
+            ),
+          ),
+          Text('held with good form', style: theme.textTheme.titleMedium),
+          const SizedBox(height: 8),
+          Text(
+            '${score.round()}% of the time in position had good form '
+            '(${quality.label}).',
+            style: theme.textTheme.bodyLarge,
+          ),
+        ],
+      ),
+    );
+  }
+}
