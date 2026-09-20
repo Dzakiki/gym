@@ -1,6 +1,6 @@
 /// Which version of the Form Coach's scoring rules produced a result. Bump it
 /// whenever rules or thresholds change in a way that alters scores.
-const coachEngineVersion = 1;
+const coachEngineVersion = 2;
 
 /// One repetition's outcome, as stored.
 class RepResult {

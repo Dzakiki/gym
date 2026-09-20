@@ -129,6 +129,19 @@ void main() {
       );
     });
 
+    test('heels coming off the floor are picked up and mentioned', () {
+      final run = _run(squatFrames(const SquatMotion(heelLiftAtBottom: 0.06)));
+
+      expect(_faultsOf(run.session), contains('squat_heel_lift'));
+      expect(run.updates.map((u) => u.cue?.text), contains('Keep heels down'));
+    });
+
+    test('heels on the floor cause no fault', () {
+      final run = _run(squatFrames(const SquatMotion()));
+
+      expect(_faultsOf(run.session), isNot(contains('squat_heel_lift')));
+    });
+
     test('a fault costs points', () {
       final good = _run(squatFrames(const SquatMotion(reps: 2)));
       final leaning = _run(
