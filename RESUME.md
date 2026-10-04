@@ -37,7 +37,8 @@ Read this first, then `IMPLEMENTATION_PLAN.md` for the full design.
 | Squat heel-lift rule | Merged (PR #31) |
 | App name (FormCoach) and a placeholder launcher icon | Merged (PR #32) |
 | Rest-timer notification when the app is in the background | Merged (PR #34) |
-| Fixes from the first phone run: on-time rest alerts (exact-alarm offer + Profile row), coach buttons pinned to the bottom, smaller rep chip | In the latest PR (see `git log`) |
+| Fixes from the first phone run: on-time rest alerts (exact-alarm offer + Profile row), coach buttons pinned to the bottom, smaller rep chip | Merged (PR #35) |
+| **Release `v0.1.0`** (offline workout tracking; tag on `fa200d2`) | Tagged |
 
 `main` is protected: PR required, checks `analyze-test` and `android-build` must pass, squash-merge only.
 
@@ -50,11 +51,12 @@ Form Coach engine (pure Dart, no phone needed; build in this order, test with sy
 - TTS was heard on a real phone (one cue after the demo set). Still to check: the voice speed during a real set and that a new cue cuts off the old one. Possible follow-ups: speak the rep count, duck music (audio focus).
 - Camera pipeline (needs the phone): `camera` image stream, ML Kit detector implementing a `PoseSource`, coordinate mapping to image-height units, permission flow.
 
-Workout tracking leftovers:
+Workout tracking: **done and tagged `v0.1.0`**. Notes from the phone run:
 
-1. Rest notification on a phone: the alarm is scheduled when the app is left (seen in `dumpsys alarm`). Without exact alarms Android gave it a window of ~43 s, so the app now offers once to allow them (and Profile has a Rest alerts row). After Allow it arrived 38 ms after the rest ended. OPPO ColorOS stretches ordinary exact alarms (`setExactAndAllowWhileIdle`) into a ~45 s window, so with the permission the app uses alarm-clock alarms (`AndroidScheduleMode.alarmClock`), which it keeps exact.
-2. Tag `v0.1.0` (bump `pubspec.yaml` version in a PR, then `git tag v0.1.0 && git push --tags`).
-3. Phase 2 (camera + pose spike) **needs the Android phone plugged in with USB debugging on**.
+- Rest notification: the alarm is scheduled when the app is left (seen in `dumpsys alarm`). Without exact alarms Android gave it a window of ~43 s, so the app now offers once to allow them (and Profile has a Rest alerts row). After Allow it arrived 38 ms after the rest ended. OPPO ColorOS stretches ordinary exact alarms (`setExactAndAllowWhileIdle`) into a ~45 s window, so with the permission the app uses alarm-clock alarms (`AndroidScheduleMode.alarmClock`), which it keeps exact.
+- Next release: bump `version:` in `pubspec.yaml` (e.g. `0.2.0+2`) in a PR, then tag the merged commit (`git tag -a v0.2.0 <sha> -m ...` and `git push origin v0.2.0`).
+
+**Next up: Phase 2 (camera + pose spike).** It needs the Android phone plugged in with USB debugging on and unlocked (see "Try the app on your phone").
 
 ## Try the app on your phone
 
