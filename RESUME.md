@@ -52,7 +52,7 @@ Form Coach engine (pure Dart, no phone needed; build in this order, test with sy
 
 Workout tracking leftovers:
 
-1. Rest notification on a phone: the alarm is scheduled when the app is left (seen in `dumpsys alarm`). Without exact alarms Android gave it a window of ~43 s, so the app now offers once to allow them (and Profile has a Rest alerts row). Still to see: the notification itself arriving on time after Allow.
+1. Rest notification on a phone: the alarm is scheduled when the app is left (seen in `dumpsys alarm`). Without exact alarms Android gave it a window of ~43 s, so the app now offers once to allow them (and Profile has a Rest alerts row). After Allow it arrived 38 ms after the rest ended. OPPO ColorOS stretches ordinary exact alarms (`setExactAndAllowWhileIdle`) into a ~45 s window, so with the permission the app uses alarm-clock alarms (`AndroidScheduleMode.alarmClock`), which it keeps exact.
 2. Tag `v0.1.0` (bump `pubspec.yaml` version in a PR, then `git tag v0.1.0 && git push --tags`).
 3. Phase 2 (camera + pose spike) **needs the Android phone plugged in with USB debugging on**.
 

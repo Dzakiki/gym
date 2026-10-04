@@ -75,7 +75,9 @@ class LocalNotificationRestAlarm implements RestAlarm {
   Future<void> schedule(DateTime endsAt) => _guard(() async {
     await prepare();
     // Exact alarms need the user's consent on Android 14+; an inexact one
-    // may come a little late but still comes.
+    // may come up to ~45 s late but still comes. With consent, an alarm-clock
+    // alarm is used: some phones (seen on OPPO ColorOS) stretch ordinary
+    // exact alarms into a window just as wide, but keep alarm clocks on time.
     final exact = await _android?.canScheduleExactNotifications() ?? false;
     await _plugin.zonedSchedule(
       id: _notificationId,
@@ -84,7 +86,7 @@ class LocalNotificationRestAlarm implements RestAlarm {
       scheduledDate: tz.TZDateTime.from(endsAt, tz.UTC),
       notificationDetails: _details,
       androidScheduleMode: exact
-          ? AndroidScheduleMode.exactAllowWhileIdle
+          ? AndroidScheduleMode.alarmClock
           : AndroidScheduleMode.inexactAllowWhileIdle,
     );
   });
