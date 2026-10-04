@@ -35,7 +35,8 @@ Read this first, then `IMPLEMENTATION_PLAN.md` for the full design.
 | Routine builder asks before discarding unsaved changes | Merged (PR #29) |
 | Spoken coach cues (`flutter_tts`, follows the Profile switch) | Merged (PR #30) |
 | Squat heel-lift rule | Merged (PR #31) |
-| App name (FormCoach) and a placeholder launcher icon | In the latest PR (see `git log`) |
+| App name (FormCoach) and a placeholder launcher icon | Merged (PR #32) |
+| Rest-timer notification when the app is in the background | In the latest PR (see `git log`) |
 
 `main` is protected: PR required, checks `analyze-test` and `android-build` must pass, squash-merge only.
 
@@ -50,9 +51,9 @@ Form Coach engine (pure Dart, no phone needed; build in this order, test with sy
 
 Workout tracking leftovers:
 
-1. `feat/p1-rest-notification`: notify when the rest timer ends while the app is in the background (`flutter_local_notifications` + `timezone`, Android 13+ notification permission, exact-alarm consideration). The in-app timer already vibrates when it ends.
-3. Tag `v0.1.0` (bump `pubspec.yaml` version in a PR, then `git tag v0.1.0 && git push --tags`).
-4. Phase 2 (camera + pose spike) **needs the Android phone plugged in with USB debugging on**.
+1. The rest notification is written but **never seen on a device**: start a rest, leave the app, and check that the notification comes on time (exact alarms are off by default on Android 14+, so it may come a little late) and that the permission prompt shows on the first rest.
+2. Tag `v0.1.0` (bump `pubspec.yaml` version in a PR, then `git tag v0.1.0 && git push --tags`).
+3. Phase 2 (camera + pose spike) **needs the Android phone plugged in with USB debugging on**.
 
 ## Try the app on your phone
 
@@ -78,7 +79,7 @@ gh pr checks --watch              # wait for green
 gh pr merge --squash --delete-branch
 ```
 
-Commit messages end with `Co-Authored-By: Claude Sonnet 5 <noreply@anthropic.com>`; PR bodies end with the Claude Code line.
+Commit messages end with `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`; PR bodies end with the Claude Code line.
 
 ## Tooling on this PC
 
@@ -101,6 +102,8 @@ Commit messages end with `Co-Authored-By: Claude Sonnet 5 <noreply@anthropic.com
 - The database is at schema version 2. Any table added later needs an `onUpgrade` step in `AppDatabase.migration` (see the v2 one) and a test like `test/data/local/migration_test.dart`.
 
 - `coachEngineVersion` (in `coach_result.dart`) is stored with every saved analysis; bump it whenever a rule or threshold changes in a way that alters scores (it is 2 since the squat heel-lift rule).
+
+- The rest timer counts down to a fixed end time read from `clockProvider` (not by counting ticks), so it is right after the phone paused the app. `clockProvider` reads `package:clock`, so `fakeAsync` and widget tests move it with their fake timers. While the app is hidden, `RestAlarm` (`rest_alarm.dart`) schedules a local notification for the end of the rest; it is cancelled when the app comes back. Tests use `SilentRestAlarm` (the harness overrides it).
 
 - The launcher icon is a placeholder drawn in code (`assets/icon/`). To change it, replace `icon.png` (1024x1024, full square) and `icon_foreground.png` (transparent, artwork inside the centre 66%), then run `dart run flutter_launcher_icons` and commit the generated files. The generator config is the `flutter_launcher_icons` block at the end of `pubspec.yaml`.
 
