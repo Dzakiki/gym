@@ -14,6 +14,14 @@ abstract interface class RestAlarm {
 
   /// Cancels the scheduled alert, if any.
   Future<void> cancel();
+
+  /// Whether the alert comes right when the rest ends. On Android 14+ it may
+  /// come up to about a minute late unless the user allows the app to set
+  /// exact alarms.
+  Future<bool> alertsOnTime();
+
+  /// Opens the system setting that lets alerts come on time.
+  Future<void> allowOnTimeAlerts();
 }
 
 /// A local notification posted by the system when the rest ends, through the
@@ -67,7 +75,9 @@ class LocalNotificationRestAlarm implements RestAlarm {
   Future<void> schedule(DateTime endsAt) => _guard(() async {
     await prepare();
     // Exact alarms need the user's consent on Android 14+; an inexact one
-    // may come a little late but still comes.
+    // may come up to ~45 s late but still comes. With consent, an alarm-clock
+    // alarm is used: some phones (seen on OPPO ColorOS) stretch ordinary
+    // exact alarms into a window just as wide, but keep alarm clocks on time.
     final exact = await _android?.canScheduleExactNotifications() ?? false;
     await _plugin.zonedSchedule(
       id: _notificationId,
@@ -76,13 +86,28 @@ class LocalNotificationRestAlarm implements RestAlarm {
       scheduledDate: tz.TZDateTime.from(endsAt, tz.UTC),
       notificationDetails: _details,
       androidScheduleMode: exact
-          ? AndroidScheduleMode.exactAllowWhileIdle
+          ? AndroidScheduleMode.alarmClock
           : AndroidScheduleMode.inexactAllowWhileIdle,
     );
   });
 
   @override
   Future<void> cancel() => _guard(() => _plugin.cancel(id: _notificationId));
+
+  @override
+  Future<bool> alertsOnTime() async {
+    try {
+      // Only Android delays alerts; elsewhere there is nothing to allow.
+      return await _android?.canScheduleExactNotifications() ?? true;
+    } on Object catch (error) {
+      debugPrint('Rest alarm failed: $error');
+      return true;
+    }
+  }
+
+  @override
+  Future<void> allowOnTimeAlerts() =>
+      _guard(() async => _android?.requestExactAlarmsPermission());
 
   AndroidFlutterLocalNotificationsPlugin? get _android => _plugin
       .resolvePlatformSpecificImplementation<
@@ -110,6 +135,12 @@ class SilentRestAlarm implements RestAlarm {
 
   @override
   Future<void> cancel() async {}
+
+  @override
+  Future<bool> alertsOnTime() async => true;
+
+  @override
+  Future<void> allowOnTimeAlerts() async {}
 }
 
 final restAlarmProvider = Provider<RestAlarm>(

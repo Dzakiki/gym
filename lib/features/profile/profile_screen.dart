@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:formcoach/domain/weight_unit.dart';
 import 'package:formcoach/features/settings/settings_providers.dart';
+import 'package:formcoach/features/workout/on_time_alerts.dart';
+import 'package:formcoach/features/workout/rest_alarm.dart';
 
 /// Settings and information about the app.
 class ProfileScreen extends ConsumerWidget {
@@ -31,6 +33,8 @@ class ProfileScreen extends ConsumerWidget {
                   ref.read(weightUnitProvider.notifier).select(selection.first),
             ),
           ),
+          const _SectionHeader('Workouts'),
+          const _RestAlertsTile(),
           const _SectionHeader('AI Coach'),
           SwitchListTile(
             title: const Text('Spoken cues'),
@@ -51,6 +55,52 @@ class ProfileScreen extends ConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Whether the "rest is over" alert comes on time, with a way to allow it.
+class _RestAlertsTile extends ConsumerStatefulWidget {
+  const _RestAlertsTile();
+
+  @override
+  ConsumerState<_RestAlertsTile> createState() => _RestAlertsTileState();
+}
+
+class _RestAlertsTileState extends ConsumerState<_RestAlertsTile> {
+  late final AppLifecycleListener _lifecycle;
+
+  @override
+  void initState() {
+    super.initState();
+    // The user changes the setting outside the app: read it again on return.
+    _lifecycle = AppLifecycleListener(
+      onResume: () => ref.invalidate(onTimeAlertsProvider),
+    );
+  }
+
+  @override
+  void dispose() {
+    _lifecycle.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final onTime = ref.watch(onTimeAlertsProvider).value ?? true;
+    return ListTile(
+      title: const Text('Rest alerts'),
+      subtitle: Text(
+        onTime
+            ? 'On time'
+            : 'When the app is in the background, the alert may come late.',
+      ),
+      trailing: onTime
+          ? null
+          : TextButton(
+              onPressed: () => ref.read(restAlarmProvider).allowOnTimeAlerts(),
+              child: const Text('Allow'),
+            ),
     );
   }
 }

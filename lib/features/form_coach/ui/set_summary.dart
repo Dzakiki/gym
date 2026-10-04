@@ -102,11 +102,14 @@ class SetSummary extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 12),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: Text(
-                  '${quality.label}, ${reps.length} reps',
-                  style: theme.textTheme.titleMedium,
+              // Wraps instead of overflowing with large text sizes.
+              Flexible(
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Text(
+                    '${quality.label}, ${reps.length} reps',
+                    style: theme.textTheme.titleMedium,
+                  ),
                 ),
               ),
             ],

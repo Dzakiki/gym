@@ -5,6 +5,7 @@ import 'package:formcoach/data/local/app_database.dart';
 import 'package:formcoach/data/providers.dart';
 import 'package:formcoach/data/repositories/workout_repository.dart';
 import 'package:formcoach/features/settings/settings_providers.dart';
+import 'package:formcoach/features/workout/on_time_alerts.dart';
 import 'package:formcoach/features/workout/rest_timer.dart';
 import 'package:formcoach/features/workout/set_input.dart';
 
@@ -102,6 +103,7 @@ class SetRow extends ConsumerWidget {
                 await repository.setCompleted(set.id, completed: !done);
                 if (!done) {
                   ref.read(restTimerProvider.notifier).start(restSeconds);
+                  if (context.mounted) await offerOnTimeAlerts(context, ref);
                 }
               },
             ),

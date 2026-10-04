@@ -27,6 +27,7 @@ void appTest(
   Future<void> Function(WidgetTester tester, AppDatabase db) body, {
   List<Override> overrides = const [],
   Map<String, Object> initialSettings = const {},
+  RestAlarm restAlarm = const SilentRestAlarm(),
 }) {
   driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
 
@@ -66,7 +67,7 @@ void appTest(
           // Never touch the real speech engine in tests.
           cuePlayerProvider.overrideWithValue(const SilentCuePlayer()),
           // Nor the notification plugin.
-          restAlarmProvider.overrideWithValue(const SilentRestAlarm()),
+          restAlarmProvider.overrideWithValue(restAlarm),
           ...overrides,
         ],
         child: const FormCoachApp(),

@@ -7,6 +7,7 @@ import 'package:formcoach/features/workout/workout_formatting.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../helpers/app_harness.dart';
+import '../../helpers/fake_rest_alarm.dart';
 
 Future<void> _openProfile(WidgetTester tester) async {
   await tester.tap(
@@ -58,6 +59,7 @@ void main() {
 
       expect(store.weightUnit, WeightUnit.kg);
       expect(store.voiceCues, isTrue);
+      expect(store.askedAboutOnTimeAlerts, isFalse);
     });
 
     test('remembers what was chosen', () async {
@@ -65,10 +67,12 @@ void main() {
       final preferences = await SharedPreferences.getInstance();
       await SettingsStore(preferences).setWeightUnit(WeightUnit.lb);
       await SettingsStore(preferences).setVoiceCues(enabled: false);
+      await SettingsStore(preferences).setAskedAboutOnTimeAlerts();
 
       final reloaded = SettingsStore(preferences);
       expect(reloaded.weightUnit, WeightUnit.lb);
       expect(reloaded.voiceCues, isFalse);
+      expect(reloaded.askedAboutOnTimeAlerts, isTrue);
     });
 
     test('ignores an unknown stored unit', () async {
@@ -95,6 +99,29 @@ void main() {
     await settle(tester);
 
     expect(tester.widget<Switch>(find.byType(Switch)).value, isFalse);
+  });
+
+  group('rest alerts in the profile', () {
+    final lateAlarm = FakeRestAlarm(onTime: false);
+
+    appTest('offer to make late alerts come on time', (tester, db) async {
+      await _openProfile(tester);
+
+      expect(find.text('Rest alerts'), findsOneWidget);
+      expect(find.textContaining('may come late'), findsOneWidget);
+      await tester.tap(find.widgetWithText(TextButton, 'Allow'));
+      await settle(tester);
+
+      expect(lateAlarm.onTimeRequests, 1);
+    }, restAlarm: lateAlarm);
+
+    appTest('say when alerts already come on time', (tester, db) async {
+      await _openProfile(tester);
+
+      expect(find.text('Rest alerts'), findsOneWidget);
+      expect(find.text('On time'), findsOneWidget);
+      expect(find.widgetWithText(TextButton, 'Allow'), findsNothing);
+    });
   });
 
   appTest('a saved unit is used when the app starts', (tester, db) async {

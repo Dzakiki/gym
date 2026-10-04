@@ -64,6 +64,22 @@ Future<void> _feed(
   await tester.pump(const Duration(milliseconds: 50));
 }
 
+// The phone the app was first tried on: 1080 x 2373 pixels, with a gesture
+// bar at the bottom.
+const _phonePixelRatio = 2.625;
+const _phoneWidth = 1080 / _phonePixelRatio;
+const _phoneHeight = 2373 / _phonePixelRatio;
+const _phoneGestureBar = 63 / _phonePixelRatio;
+
+void _usePhoneScreen(WidgetTester tester) {
+  tester.view
+    ..physicalSize = const Size(1080, 2373)
+    ..devicePixelRatio = _phonePixelRatio
+    ..padding = const FakeViewPadding(bottom: 63)
+    ..viewPadding = const FakeViewPadding(bottom: 63);
+  addTearDown(tester.view.reset);
+}
+
 void main() {
   group('skeleton painter', () {
     PoseFrame frame(Map<Landmark, LandmarkPoint> points) =>
@@ -233,7 +249,7 @@ void main() {
       await _feed(tester, source, const SquatMotion(reps: 3));
 
       expect(find.text('3'), findsOneWidget);
-      expect(find.textContaining('Rep 3:'), findsOneWidget);
+      expect(find.text('Rep 3 · 100'), findsOneWidget);
       expect(find.text('Stop'), findsOneWidget);
     });
 
@@ -304,6 +320,46 @@ void main() {
         findsOneWidget,
       );
     });
+    coachTest('on a phone the buttons stay on screen after a set', (
+      tester,
+      source,
+    ) async {
+      _usePhoneScreen(tester);
+      await _openSquatCoach(tester, source);
+      await _start(tester);
+      await _feed(tester, source, const SquatMotion(reps: 3));
+      await tester.tap(find.text('Stop'));
+      await settle(tester);
+
+      // Above the gesture bar, without scrolling.
+      const visibleBottom = _phoneHeight - _phoneGestureBar;
+      expect(tester.getRect(find.text('Done')).bottom, lessThan(visibleBottom));
+      expect(
+        tester.getRect(find.text('Again')).bottom,
+        lessThan(visibleBottom),
+      );
+    });
+
+    coachTest('the rep chip stays clear of the middle of the picture', (
+      tester,
+      source,
+    ) async {
+      _usePhoneScreen(tester);
+      final semantics = tester.ensureSemantics();
+      await _openSquatCoach(tester, source);
+      await _start(tester);
+      await _feed(tester, source, const SquatMotion(reps: 3));
+
+      final chip = tester.getRect(find.byType(Chip));
+      expect(chip.left, greaterThan(_phoneWidth * 0.6));
+      expect(
+        // The picture is read out as one item, so match part of its label.
+        find.bySemanticsLabel(RegExp(r'Rep 3, score \d+, \w+')),
+        findsOneWidget,
+      );
+      semantics.dispose();
+    });
+
     coachTest('a plank shows a timer instead of a rep counter', (
       tester,
       source,

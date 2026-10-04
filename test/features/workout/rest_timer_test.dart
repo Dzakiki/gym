@@ -6,21 +6,7 @@ import 'package:formcoach/core/clock.dart';
 import 'package:formcoach/features/workout/rest_alarm.dart';
 import 'package:formcoach/features/workout/rest_timer.dart';
 
-/// Records what the timer asked of the alarm.
-class FakeRestAlarm implements RestAlarm {
-  int prepared = 0;
-  final scheduled = <DateTime>[];
-  int cancelled = 0;
-
-  @override
-  Future<void> prepare() async => prepared++;
-
-  @override
-  Future<void> schedule(DateTime endsAt) async => scheduled.add(endsAt);
-
-  @override
-  Future<void> cancel() async => cancelled++;
-}
+import '../../helpers/fake_rest_alarm.dart';
 
 void main() {
   // The timer ends with a haptic pulse, which needs the platform binding.

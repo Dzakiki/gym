@@ -60,21 +60,25 @@ class CoachSessionScreen extends ConsumerWidget {
               SetSummary(reps: state.reps, partialCount: state.partialCount),
           if (state.status == CoachStatus.ready)
             const Padding(
-              padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
+              padding: EdgeInsets.all(16),
               child: Text(
                 'Demo mode: a simulated person is shown until the camera is '
                 'connected.',
               ),
             ),
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: _Controls(
-              state: state,
-              controller: controller,
-              onSave: setLogId == null ? null : () => save(definition.isHold),
-            ),
-          ),
         ],
+      ),
+      // Pinned below the list so the buttons (and Save) are always in reach,
+      // however long the summary is, and clear of the system gesture bar.
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: _Controls(
+            state: state,
+            controller: controller,
+            onSave: setLogId == null ? null : () => save(definition.isHold),
+          ),
+        ),
       ),
     );
   }
@@ -137,6 +141,7 @@ class _Controls extends StatelessWidget {
             onSave != null &&
             (state.repCount > 0 || state.holdTime > Duration.zero);
         return Column(
+          mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             if (canSave) ...[
@@ -179,6 +184,12 @@ class _Preview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) => _layers(context, constraints.maxWidth),
+    );
+  }
+
+  Widget _layers(BuildContext context, double width) {
     final theme = Theme.of(context);
     final latest = state.latest;
     final tracking = latest?.tracking ?? true;
@@ -216,7 +227,20 @@ class _Preview extends StatelessWidget {
             ),
           ),
           if (state.lastRep case final rep?)
-            Positioned(right: 16, top: 16, child: _RepChip(rep: rep)),
+            Positioned(
+              right: 16,
+              top: 16,
+              child: ConstrainedBox(
+                // Never reaches the middle, where the person is, whatever
+                // the text size.
+                constraints: BoxConstraints(maxWidth: width * 0.3),
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.topRight,
+                  child: _RepChip(rep: rep),
+                ),
+              ),
+            ),
           if (state.status == CoachStatus.running && !tracking)
             const Center(
               child: Text(
@@ -237,6 +261,8 @@ class _Preview extends StatelessWidget {
   }
 }
 
+/// The score of the last rep. Kept short so it stays in the corner, clear of
+/// the person in the middle of the picture; the colour shows the quality.
 class _RepChip extends StatelessWidget {
   const _RepChip({required this.rep});
 
@@ -245,11 +271,17 @@ class _RepChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    return Chip(
-      backgroundColor: qualityColor(rep.quality, scheme),
-      label: Text(
-        'Rep ${rep.index}: ${rep.score.round()} ${rep.quality.label}',
-        style: TextStyle(color: scheme.surface),
+    final score = rep.score.round();
+    return Semantics(
+      label: 'Rep ${rep.index}, score $score, ${rep.quality.label}',
+      child: ExcludeSemantics(
+        child: Chip(
+          backgroundColor: qualityColor(rep.quality, scheme),
+          label: Text(
+            'Rep ${rep.index} · $score',
+            style: TextStyle(color: scheme.surface),
+          ),
+        ),
       ),
     );
   }
