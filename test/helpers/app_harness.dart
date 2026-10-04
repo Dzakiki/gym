@@ -13,6 +13,7 @@ import 'package:formcoach/data/seed/template_seeder.dart';
 import 'package:formcoach/features/form_coach/coach_controller.dart';
 import 'package:formcoach/features/form_coach/cue_player.dart';
 import 'package:formcoach/features/settings/settings_providers.dart';
+import 'package:formcoach/features/workout/rest_alarm.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'file_asset_bundle.dart';
@@ -64,6 +65,8 @@ void appTest(
           sharedPreferencesProvider.overrideWithValue(preferences!),
           // Never touch the real speech engine in tests.
           cuePlayerProvider.overrideWithValue(const SilentCuePlayer()),
+          // Nor the notification plugin.
+          restAlarmProvider.overrideWithValue(const SilentRestAlarm()),
           ...overrides,
         ],
         child: const FormCoachApp(),
