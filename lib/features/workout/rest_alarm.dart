@@ -14,6 +14,14 @@ abstract interface class RestAlarm {
 
   /// Cancels the scheduled alert, if any.
   Future<void> cancel();
+
+  /// Whether the alert comes right when the rest ends. On Android 14+ it may
+  /// come up to about a minute late unless the user allows the app to set
+  /// exact alarms.
+  Future<bool> alertsOnTime();
+
+  /// Opens the system setting that lets alerts come on time.
+  Future<void> allowOnTimeAlerts();
 }
 
 /// A local notification posted by the system when the rest ends, through the
@@ -84,6 +92,21 @@ class LocalNotificationRestAlarm implements RestAlarm {
   @override
   Future<void> cancel() => _guard(() => _plugin.cancel(id: _notificationId));
 
+  @override
+  Future<bool> alertsOnTime() async {
+    try {
+      // Only Android delays alerts; elsewhere there is nothing to allow.
+      return await _android?.canScheduleExactNotifications() ?? true;
+    } on Object catch (error) {
+      debugPrint('Rest alarm failed: $error');
+      return true;
+    }
+  }
+
+  @override
+  Future<void> allowOnTimeAlerts() =>
+      _guard(() async => _android?.requestExactAlarmsPermission());
+
   AndroidFlutterLocalNotificationsPlugin? get _android => _plugin
       .resolvePlatformSpecificImplementation<
         AndroidFlutterLocalNotificationsPlugin
@@ -110,6 +133,12 @@ class SilentRestAlarm implements RestAlarm {
 
   @override
   Future<void> cancel() async {}
+
+  @override
+  Future<bool> alertsOnTime() async => true;
+
+  @override
+  Future<void> allowOnTimeAlerts() async {}
 }
 
 final restAlarmProvider = Provider<RestAlarm>(

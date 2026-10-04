@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:formcoach/data/local/app_database.dart';
 
 import '../../helpers/app_harness.dart';
+import '../../helpers/fake_rest_alarm.dart';
 
 Future<void> _startPushDay(WidgetTester tester) async {
   await openWorkoutsTab(tester);
@@ -54,6 +55,56 @@ void main() {
     await tester.tap(find.text('Skip'));
     await tester.pump();
     expect(find.textContaining('Rest '), findsNothing);
+  });
+
+  group('on-time rest alerts', () {
+    const question = 'Get rest alerts on time?';
+
+    Future<void> tickSet(WidgetTester tester, int index) async {
+      await tester.tap(find.byTooltip('Complete set 1').at(index));
+      await settle(tester);
+    }
+
+    final allowing = FakeRestAlarm(onTime: false);
+    appTest('are offered once when alerts would come late', (tester, db) async {
+      await _startPushDay(tester);
+
+      await tickSet(tester, 0);
+      expect(find.text(question), findsOneWidget);
+      await tester.tap(find.text('Allow'));
+      await settle(tester);
+      expect(allowing.onTimeRequests, 1);
+      expect(find.text(question), findsNothing);
+      // The rest keeps running behind the question.
+      expect(find.textContaining('Rest '), findsOneWidget);
+
+      await tickSet(tester, 1);
+      expect(find.text(question), findsNothing);
+    }, restAlarm: allowing);
+
+    final declining = FakeRestAlarm(onTime: false);
+    appTest('are not asked about again after Not now', (tester, db) async {
+      await _startPushDay(tester);
+
+      await tickSet(tester, 0);
+      await tester.tap(find.text('Not now'));
+      await settle(tester);
+      await tickSet(tester, 1);
+
+      expect(find.text(question), findsNothing);
+      expect(declining.onTimeRequests, 0);
+    }, restAlarm: declining);
+
+    appTest('are not mentioned when alerts already come on time', (
+      tester,
+      db,
+    ) async {
+      await _startPushDay(tester);
+
+      await tickSet(tester, 0);
+
+      expect(find.text(question), findsNothing);
+    });
   });
 
   appTest('typed reps are saved', (tester, db) async {

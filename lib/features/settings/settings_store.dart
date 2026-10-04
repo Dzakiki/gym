@@ -7,6 +7,7 @@ class SettingsStore {
 
   static const _weightUnitKey = 'weight_unit';
   static const _voiceCuesKey = 'voice_cues';
+  static const _askedAboutOnTimeAlertsKey = 'asked_about_on_time_alerts';
 
   final SharedPreferences _preferences;
 
@@ -27,4 +28,11 @@ class SettingsStore {
 
   Future<void> setVoiceCues({required bool enabled}) =>
       _preferences.setBool(_voiceCuesKey, enabled);
+
+  /// Whether the user was already asked to let rest alerts come on time.
+  bool get askedAboutOnTimeAlerts =>
+      _preferences.getBool(_askedAboutOnTimeAlertsKey) ?? false;
+
+  Future<void> setAskedAboutOnTimeAlerts() =>
+      _preferences.setBool(_askedAboutOnTimeAlertsKey, true);
 }

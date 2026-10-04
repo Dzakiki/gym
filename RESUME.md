@@ -36,7 +36,8 @@ Read this first, then `IMPLEMENTATION_PLAN.md` for the full design.
 | Spoken coach cues (`flutter_tts`, follows the Profile switch) | Merged (PR #30) |
 | Squat heel-lift rule | Merged (PR #31) |
 | App name (FormCoach) and a placeholder launcher icon | Merged (PR #32) |
-| Rest-timer notification when the app is in the background | In the latest PR (see `git log`) |
+| Rest-timer notification when the app is in the background | Merged (PR #34) |
+| Fixes from the first phone run: on-time rest alerts (exact-alarm offer + Profile row), coach buttons pinned to the bottom, smaller rep chip | In the latest PR (see `git log`) |
 
 `main` is protected: PR required, checks `analyze-test` and `android-build` must pass, squash-merge only.
 
@@ -46,18 +47,18 @@ Form Coach engine (pure Dart, no phone needed; build in this order, test with sy
 
 - The squat is the template: see `lib/features/form_coach/exercises/squat.dart` (metrics, limits, rules) and `lib/features/form_coach/demo/pose_synth.dart` (generates squat frames from joint angles; extend it with push-up, lunge, plank and jumping-jack poses).
 - **All the agreed bodyweight exercises are coached** (squat, push-up, plank, dip, pull-up, lunge, jumping jack), each as one definition in `lib/features/form_coach/exercises/` with a synthetic pose generator in `lib/features/form_coach/demo/` and tests. All thresholds are starting values worked out on generated poses only; **they must be tuned with real recordings**. Known gaps: walking (alternating) lunges, side-view detection of exercises filmed at the wrong angle, and per-user calibration. Adding another exercise: definition + registry entry + `coachKey` in `assets/seed/exercises.json` (a test keeps the two in step).
-- TTS is written (`tts_cue_player.dart`) but **never heard on a device**: check the voice, speed and that a new cue cuts off the old one. Possible follow-ups: speak the rep count, duck music (audio focus).
+- TTS was heard on a real phone (one cue after the demo set). Still to check: the voice speed during a real set and that a new cue cuts off the old one. Possible follow-ups: speak the rep count, duck music (audio focus).
 - Camera pipeline (needs the phone): `camera` image stream, ML Kit detector implementing a `PoseSource`, coordinate mapping to image-height units, permission flow.
 
 Workout tracking leftovers:
 
-1. The rest notification is written but **never seen on a device**: start a rest, leave the app, and check that the notification comes on time (exact alarms are off by default on Android 14+, so it may come a little late) and that the permission prompt shows on the first rest.
+1. Rest notification on a phone: the alarm is scheduled when the app is left (seen in `dumpsys alarm`). Without exact alarms Android gave it a window of ~43 s, so the app now offers once to allow them (and Profile has a Rest alerts row). Still to see: the notification itself arriving on time after Allow.
 2. Tag `v0.1.0` (bump `pubspec.yaml` version in a PR, then `git tag v0.1.0 && git push --tags`).
 3. Phase 2 (camera + pose spike) **needs the Android phone plugged in with USB debugging on**.
 
 ## Try the app on your phone
 
-The app has never been run on a real device yet (only tests and CI builds). To try it:
+The app was first run on a real phone on 2026-10-04 (OPPO CPH2737, Android 16): it starts, seeds the library, runs workouts and the demo coach. OPPO asks to confirm every USB install on the phone (it waits on the lock screen), and the phone has a PIN, so it must be unlocked for testing; `adb shell svc power stayon usb` keeps the screen on while plugged in (turn off with `svc power stayon false`). To try it:
 
 1. Easiest: open the latest green run on GitHub (Actions tab), download the `app-debug-apk` artifact, unzip it, and install `app-debug.apk` on the phone (allow installs from unknown sources).
 2. Or plug the phone in (USB debugging on), then `flutter devices` and `flutter run` in `C:\Users\AhmadDzaki\gym-app`.
