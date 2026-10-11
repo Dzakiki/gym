@@ -101,6 +101,17 @@ void main() {
     expect(tester.widget<Switch>(find.byType(Switch)).value, isFalse);
   });
 
+  appTest('the camera test opens from the profile', (tester, db) async {
+    await _openProfile(tester);
+
+    await tester.tap(find.text('Camera test'));
+    await settle(tester);
+
+    // Tests have no camera, so the screen explains that it couldn't open one.
+    expect(find.widgetWithText(AppBar, 'Camera test'), findsOneWidget);
+    expect(find.textContaining('could not be opened'), findsOneWidget);
+  });
+
   group('rest alerts in the profile', () {
     final lateAlarm = FakeRestAlarm(onTime: false);
 

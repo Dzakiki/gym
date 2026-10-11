@@ -1,9 +1,16 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
     <!-- Rest timer: tell the athlete the rest is over while the app is in the
          background. Exact alarms are used only when the user allows them
          (Android 14+ denies them by default); otherwise the alarm is inexact. -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
+    <!-- AI Coach: the camera is analysed on the phone. Video is recorded
+         without sound, so the microphone permission the camera plugin
+         adds is removed. Phones without a camera can still log workouts. -->
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.RECORD_AUDIO" tools:node="remove"/>
+    <uses-feature android:name="android.hardware.camera.any" android:required="false"/>
     <application
         android:label="FormCoach"
         android:name="${applicationName}"

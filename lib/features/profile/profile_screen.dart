@@ -4,6 +4,7 @@ import 'package:formcoach/domain/weight_unit.dart';
 import 'package:formcoach/features/settings/settings_providers.dart';
 import 'package:formcoach/features/workout/on_time_alerts.dart';
 import 'package:formcoach/features/workout/rest_alarm.dart';
+import 'package:go_router/go_router.dart';
 
 /// Settings and information about the app.
 class ProfileScreen extends ConsumerWidget {
@@ -42,6 +43,12 @@ class ProfileScreen extends ConsumerWidget {
             value: voice,
             onChanged: (enabled) =>
                 ref.read(voiceCuesProvider.notifier).set(enabled: enabled),
+          ),
+          ListTile(
+            title: const Text('Camera test'),
+            subtitle: const Text('Live body tracking and its speed.'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => context.push('/camera-test'),
           ),
           const _SectionHeader('About'),
           Padding(

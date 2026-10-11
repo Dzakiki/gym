@@ -35,14 +35,14 @@ class SkeletonPainter extends CustomPainter {
   final Color jointColor;
 
   /// The lines to draw for [frame] inside an area of [size]. A bone is only
-  /// included when both of its landmarks were found.
+  /// included when both of its landmarks were found with some confidence
+  /// (the detector also guesses at body parts outside the picture).
   static List<(Offset, Offset)> boneSegments(PoseFrame? frame, Size size) {
     if (frame == null) return const [];
     Offset? place(Landmark landmark) {
-      final position = frame.position(landmark);
-      return position == null
-          ? null
-          : Offset(position.x * size.height, position.y * size.height);
+      if (!frame.isVisible(landmark)) return null;
+      final position = frame.position(landmark)!;
+      return Offset(position.x * size.height, position.y * size.height);
     }
 
     return [

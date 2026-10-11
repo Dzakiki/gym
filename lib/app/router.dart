@@ -5,6 +5,7 @@ import 'package:formcoach/features/coach/coach_screen.dart';
 import 'package:formcoach/features/exercises/exercise_detail_screen.dart';
 import 'package:formcoach/features/exercises/exercise_form_screen.dart';
 import 'package:formcoach/features/exercises/exercise_library_screen.dart';
+import 'package:formcoach/features/form_coach/ui/camera_test_screen.dart';
 import 'package:formcoach/features/form_coach/ui/coach_session_screen.dart';
 import 'package:formcoach/features/history/workout_detail_screen.dart';
 import 'package:formcoach/features/home/home_screen.dart';
@@ -103,6 +104,10 @@ final routerProvider = Provider<GoRouter>((ref) {
           coachKey: state.pathParameters['key']!,
           setLogId: state.uri.queryParameters['set'],
         ),
+      ),
+      GoRoute(
+        path: '/camera-test',
+        builder: (context, state) => const CameraTestScreen(),
       ),
       // Full screen, above the tab bar, so nothing distracts while training.
       GoRoute(

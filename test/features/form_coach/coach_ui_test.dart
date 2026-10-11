@@ -115,6 +115,23 @@ void main() {
       expect(segments, hasLength(2));
     });
 
+    test('skips bones with a landmark the detector is unsure of', () {
+      final segments = SkeletonPainter.boneSegments(
+        frame({
+          Landmark.leftHip: const LandmarkPoint(Vec2(0.5, 0.5)),
+          Landmark.leftKnee: const LandmarkPoint(Vec2(0.5, 0.75)),
+          // Out of the picture: the detector guesses where it might be.
+          Landmark.leftAnkle: const LandmarkPoint(
+            Vec2(0.5, 1.2),
+            likelihood: 0.1,
+          ),
+        }),
+        const Size(100, 100),
+      );
+
+      expect(segments, hasLength(1));
+    });
+
     test('a full synthetic body gives many bones', () {
       final segments = SkeletonPainter.boneSegments(
         frame(squatPose(kneeAngle: 90, torsoLean: 20, shinLean: 20)),

@@ -451,7 +451,7 @@ The same tables mirrored in drift, plus:
 - **Done when:** you can build a routine, do a full workout, and see it in history, all offline.
 
 ### Phase 2: Form Coach foundation (weeks 5–7)
-- [ ] **Spike (first 3 days)**: camera preview + image stream + ML Kit + raw landmark dots. Measure fps. Test recording while streaming.
+- [x] **Spike (first 3 days)**: camera preview + image stream + ML Kit + raw landmark dots. Measure fps. Test recording while streaming.
 - [ ] `PoseDetectorService` + `MlkitPoseDetector` + `FrameConverter` (rotation, formats)
 - [ ] Coordinate mapping + mirroring; `SkeletonPainter`
 - [ ] `geometry.dart`, `OneEuroFilter`, `LandmarkSmoother`, visibility gating, `Features`
