@@ -1,3 +1,4 @@
+import 'package:camera/camera.dart' show CameraException;
 import 'package:drift/drift.dart' show driftRuntimeOptions;
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
@@ -10,6 +11,7 @@ import 'package:formcoach/data/providers.dart';
 import 'package:formcoach/data/seed/exercise_seeder.dart';
 import 'package:formcoach/data/seed/seed_service.dart';
 import 'package:formcoach/data/seed/template_seeder.dart';
+import 'package:formcoach/features/form_coach/camera/camera_pose_source.dart';
 import 'package:formcoach/features/form_coach/coach_controller.dart';
 import 'package:formcoach/features/form_coach/cue_player.dart';
 import 'package:formcoach/features/settings/settings_providers.dart';
@@ -68,6 +70,10 @@ void appTest(
           cuePlayerProvider.overrideWithValue(const SilentCuePlayer()),
           // Nor the notification plugin.
           restAlarmProvider.overrideWithValue(restAlarm),
+          // Nor the camera, which tests don't have.
+          openCameraProvider.overrideWithValue(
+            (lens) async => throw CameraException('NoCamera', 'No camera.'),
+          ),
           ...overrides,
         ],
         child: const FormCoachApp(),
