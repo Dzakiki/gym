@@ -137,11 +137,13 @@ class _CameraTestScreenState extends ConsumerState<CameraTestScreen> {
           children: [
             CameraPreview(
               source.controller,
-              child: CustomPaint(
-                painter: SkeletonPainter(
-                  frame: _frame,
-                  boneColor: Colors.white,
-                  jointColor: Theme.of(context).colorScheme.primary,
+              child: ClipRect(
+                child: CustomPaint(
+                  painter: SkeletonPainter(
+                    frame: _frame,
+                    boneColor: Colors.white,
+                    jointColor: Theme.of(context).colorScheme.primary,
+                  ),
                 ),
               ),
             ),

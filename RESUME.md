@@ -39,7 +39,7 @@ Read this first, then `IMPLEMENTATION_PLAN.md` for the full design.
 | Rest-timer notification when the app is in the background | Merged (PR #34) |
 | Fixes from the first phone run: on-time rest alerts (exact-alarm offer + Profile row), coach buttons pinned to the bottom, smaller rep chip | Merged (PR #35) |
 | **Release `v0.1.0`** (offline workout tracking; tag on `fa200d2`) | Tagged |
-| Phase 2 spike: camera + ML Kit pose source (`lib/features/form_coach/camera/`), Profile → Camera test screen (live skeleton, fps, detection time, record-while-streaming) | In review: needs the phone check |
+| Phase 2 spike: camera + ML Kit pose source (`lib/features/form_coach/camera/`), Profile → Camera test screen (live skeleton, fps, detection time, record-while-streaming) | Merged (PR #42) |
 
 `main` is protected: PR required, checks `analyze-test` and `android-build` must pass, squash-merge only.
 
@@ -57,7 +57,14 @@ Workout tracking: **done and tagged `v0.1.0`**. Notes from the phone run:
 - Rest notification: the alarm is scheduled when the app is left (seen in `dumpsys alarm`). Without exact alarms Android gave it a window of ~43 s, so the app now offers once to allow them (and Profile has a Rest alerts row). After Allow it arrived 38 ms after the rest ended. OPPO ColorOS stretches ordinary exact alarms (`setExactAndAllowWhileIdle`) into a ~45 s window, so with the permission the app uses alarm-clock alarms (`AndroidScheduleMode.alarmClock`), which it keeps exact.
 - Next release: bump `version:` in `pubspec.yaml` (e.g. `0.2.0+2`) in a PR, then tag the merged commit (`git tag -a v0.2.0 <sha> -m ...` and `git push origin v0.2.0`).
 
-**Next up: Phase 2 (camera + pose spike).** The code is written (`CameraPoseSource`, Profile → Camera test). On the phone, check: the skeleton lines up with the body on the back and front cameras, analysed fps (target ≥15), detection time, knee angles look right, and whether "Record a clip" keeps detection running. Then connect `CameraPoseSource` to the coach (`poseSourceProvider`) with a permission explainer. It needs the Android phone plugged in with USB debugging on and unlocked (see "Try the app on your phone").
+**Phase 2 spike: done on the phone (2026-10-11, OPPO CPH2737).** Results from Profile → Camera test:
+
+- Camera images and preview are both 720x480 (`ResolutionPreset.medium`), so the overlay lines up; the skeleton matched the body on the back camera (turned 90°) and the mirrored front camera (turned 270°).
+- With a person in view: back camera **26 analysed fps, ~21 ms detection**; front camera 14–19 fps (indoors it delivers only ~20 fps). With nobody in view detection is slower (40–90 ms, 7–13 fps) because ML Kit keeps searching.
+- Recording while detecting works: 16 fps during an 8 s clip (6 MB, deleted).
+- ML Kit also guesses body parts outside the picture with low likelihood; the skeleton now draws only landmarks with likelihood ≥ 0.5.
+
+**Next up:** connect `CameraPoseSource` to the coach (`poseSourceProvider`), with a camera-permission explainer and the setup checks (in frame, distance, side), then record real fixtures to tune the thresholds. It needs the Android phone plugged in with USB debugging on and unlocked (see "Try the app on your phone").
 
 ## Try the app on your phone
 
