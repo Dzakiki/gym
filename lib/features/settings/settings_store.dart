@@ -8,6 +8,7 @@ class SettingsStore {
   static const _weightUnitKey = 'weight_unit';
   static const _voiceCuesKey = 'voice_cues';
   static const _askedAboutOnTimeAlertsKey = 'asked_about_on_time_alerts';
+  static const _cameraExplainedKey = 'camera_explained';
 
   final SharedPreferences _preferences;
 
@@ -35,4 +36,11 @@ class SettingsStore {
 
   Future<void> setAskedAboutOnTimeAlerts() =>
       _preferences.setBool(_askedAboutOnTimeAlertsKey, true);
+
+  /// Whether the user has seen why the coach needs the camera.
+  bool get cameraExplained =>
+      _preferences.getBool(_cameraExplainedKey) ?? false;
+
+  Future<void> setCameraExplained() =>
+      _preferences.setBool(_cameraExplainedKey, true);
 }

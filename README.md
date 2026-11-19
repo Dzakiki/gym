@@ -6,7 +6,7 @@ A gym app for planning and tracking workouts, with a **real-time AI form coach**
 
 ## Status
 
-Work in progress. The workout tracker is complete and offline-first. The form coach works end to end on a **simulated person**; connecting the real camera is the next big step.
+Work in progress. The workout tracker is complete and offline-first. The form coach runs on the phone's camera (or a simulated person, to try it without filming); its thresholds still need tuning with real recordings.
 
 | Area | State |
 |---|---|

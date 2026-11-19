@@ -1,4 +1,4 @@
-import 'package:camera/camera.dart' show CameraException;
+import 'package:camera/camera.dart' show CameraException, CameraLensDirection;
 import 'package:drift/drift.dart' show driftRuntimeOptions;
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +13,7 @@ import 'package:formcoach/data/seed/seed_service.dart';
 import 'package:formcoach/data/seed/template_seeder.dart';
 import 'package:formcoach/features/form_coach/camera/camera_pose_source.dart';
 import 'package:formcoach/features/form_coach/coach_controller.dart';
+import 'package:formcoach/features/form_coach/coach_input.dart';
 import 'package:formcoach/features/form_coach/cue_player.dart';
 import 'package:formcoach/features/settings/settings_providers.dart';
 import 'package:formcoach/features/workout/rest_alarm.dart';
@@ -30,6 +31,8 @@ void appTest(
   List<Override> overrides = const [],
   Map<String, Object> initialSettings = const {},
   RestAlarm restAlarm = const SilentRestAlarm(),
+  CoachInput coachInput = CoachInput.demo,
+  Future<CameraPoseSource> Function(CameraLensDirection lens)? openCamera,
 }) {
   driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
 
@@ -72,8 +75,11 @@ void appTest(
           restAlarmProvider.overrideWithValue(restAlarm),
           // Nor the camera, which tests don't have.
           openCameraProvider.overrideWithValue(
-            (lens) async => throw CameraException('NoCamera', 'No camera.'),
+            openCamera ??
+                (lens) async => throw CameraException('NoCamera', 'No camera.'),
           ),
+          // The coach runs the demo unless a test asks for the camera.
+          defaultCoachInputProvider.overrideWithValue(coachInput),
           ...overrides,
         ],
         child: const FormCoachApp(),
