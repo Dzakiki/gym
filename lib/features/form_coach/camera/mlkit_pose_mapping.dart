@@ -38,6 +38,7 @@ PoseFrame poseFrameFromMlKit(
   final width = uprightSize.width;
   return PoseFrame(
     timestamp: timestamp,
+    width: width / height,
     points: {
       for (final landmark in Landmark.values)
         if (pose.landmarks[_mlKitTypes[landmark]] case final point?)

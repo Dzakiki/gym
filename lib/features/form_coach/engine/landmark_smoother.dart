@@ -45,7 +45,11 @@ class LandmarkSmoother {
         likelihood: point.likelihood,
       );
     }
-    return PoseFrame(timestamp: frame.timestamp, points: smoothed);
+    return PoseFrame(
+      timestamp: frame.timestamp,
+      points: smoothed,
+      width: frame.width,
+    );
   }
 
   /// Forgets all history, e.g. when a new set starts.
