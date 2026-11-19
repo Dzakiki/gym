@@ -32,11 +32,15 @@ class LandmarkPoint {
 
 /// All landmarks found in one camera frame.
 class PoseFrame {
-  const PoseFrame({required this.timestamp, required this.points});
+  const PoseFrame({required this.timestamp, required this.points, this.width});
 
   /// Time since the start of the set.
   final Duration timestamp;
   final Map<Landmark, LandmarkPoint> points;
+
+  /// The width of the picture in image-height units (its aspect ratio), when
+  /// known. Positions run from 0 to 1 vertically and 0 to [width] across.
+  final double? width;
 
   /// Where [landmark] is, or null if it was not found.
   Vec2? position(Landmark landmark) => points[landmark]?.position;

@@ -145,11 +145,16 @@ class CameraPoseSource implements PoseSource {
       if (_disposed) return;
 
       final imageSize = Size(image.width.toDouble(), image.height.toDouble());
+      final upright = uprightSize(imageSize, rotation);
       final frame = poses.isEmpty
-          ? PoseFrame(timestamp: now, points: const {})
+          ? PoseFrame(
+              timestamp: now,
+              points: const {},
+              width: upright.width / upright.height,
+            )
           : poseFrameFromMlKit(
               poses.first,
-              uprightSize: uprightSize(imageSize, rotation),
+              uprightSize: upright,
               mirror: isFrontCamera,
               timestamp: now,
             );
