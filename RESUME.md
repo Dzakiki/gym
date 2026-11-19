@@ -40,6 +40,9 @@ Read this first, then `IMPLEMENTATION_PLAN.md` for the full design.
 | Fixes from the first phone run: on-time rest alerts (exact-alarm offer + Profile row), coach buttons pinned to the bottom, smaller rep chip | Merged (PR #35) |
 | **Release `v0.1.0`** (offline workout tracking; tag on `fa200d2`) | Tagged |
 | Phase 2 spike: camera + ML Kit pose source (`lib/features/form_coach/camera/`), Profile → Camera test screen (live skeleton, fps, detection time, record-while-streaming) | Merged (PR #42) |
+| Dependency bumps (fl_chart, go_router, build_runner, notifications, timezone, setup-java; drift 2.35.4 to match drift_dev) | Merged (PR #52) |
+| Setup check before a set: in view, distance (body 50–90% of the picture), facing the right way, 1 s steady (`engine/setup_check.dart`) | Merged (PR #53) |
+| Coach uses the camera: explainer before the permission prompt, setup phase with spoken hints, then "Go"; demo toggle in the app bar; camera released in the background | PR (this branch) |
 
 `main` is protected: PR required, checks `analyze-test` and `android-build` must pass, squash-merge only.
 
@@ -64,7 +67,13 @@ Workout tracking: **done and tagged `v0.1.0`**. Notes from the phone run:
 - Recording while detecting works: 16 fps during an 8 s clip (6 MB, deleted).
 - ML Kit also guesses body parts outside the picture with low likelihood; the skeleton now draws only landmarks with likelihood ≥ 0.5.
 
-**Next up:** connect `CameraPoseSource` to the coach (`poseSourceProvider`), with a camera-permission explainer and the setup checks (in frame, distance, side), then record real fixtures to tune the thresholds. It needs the Android phone plugged in with USB debugging on and unlocked (see "Try the app on your phone").
+**Camera coaching is wired up but not yet tried on the phone.** The coach screen now opens the camera (`CoachInput.camera`; tests default to the demo through `defaultCoachInputProvider`). Start runs `SetupCheck` (`CoachStatus.settingUp`) and the set begins once the athlete has been placed right for 1 s; session timestamps count from that moment.
+
+**Next up (needs the phone plugged in, unlocked, USB debugging on):**
+
+1. Try a coached squat on the camera: the explainer, the Android permission prompt, the setup hints (spoken and shown), "Go", counting, leaving the app mid-set and coming back.
+2. Check the setup limits on real people (`SetupLimits`): the side-on shoulder ratio (≤ 0.55) is the likeliest to be wrong, since ML Kit places the far shoulder roughly.
+3. Record real fixtures (keypoints, maybe clips) to tune the exercise thresholds.
 
 ## Try the app on your phone
 
@@ -73,7 +82,7 @@ The app was first run on a real phone on 2026-10-04 (OPPO CPH2737, Android 16): 
 1. Easiest: open the latest green run on GitHub (Actions tab), download the `app-debug-apk` artifact, unzip it, and install `app-debug.apk` on the phone (allow installs from unknown sources).
 2. Or plug the phone in (USB debugging on), then `flutter devices` and `flutter run` in `C:\Users\AhmadDzaki\gym-app`.
 
-The Coach tab runs on a **simulated person** (demo source), not the camera. Check that the app starts, seeds the library, and that a full workout and a demo coach set work. Report anything odd; real-device problems (database, fonts, permissions) are the most likely surprises.
+The Coach tab uses the camera (the robot icon in its app bar switches to the simulated person). Check that the app starts, seeds the library, and that a full workout and a coached set work. Report anything odd; real-device problems (database, fonts, permissions) are the most likely surprises.
 
 ## How to work
 

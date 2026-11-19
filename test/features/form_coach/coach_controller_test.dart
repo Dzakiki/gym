@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:formcoach/features/form_coach/coach_controller.dart';
 import 'package:formcoach/features/form_coach/cue_player.dart';
 import 'package:formcoach/features/form_coach/demo/pose_synth.dart';
+import 'package:formcoach/features/form_coach/engine/setup_check.dart';
 import 'package:formcoach/features/form_coach/pose/pose.dart';
 import 'package:formcoach/features/form_coach/pose/pose_source.dart';
 
@@ -146,6 +147,95 @@ void main() {
     source.controller.add(squatFrames(const SquatMotion(reps: 1)).first);
 
     await pumpEventQueue();
+  });
+
+  group('with a setup check', () {
+    /// Standing still, well placed, every 33 ms for [milliseconds].
+    List<PoseFrame> standing(int milliseconds, {int from = 0}) => [
+      for (var t = from; t <= from + milliseconds; t += 33)
+        PoseFrame(
+          timestamp: Duration(milliseconds: t),
+          points: squatPose(kneeAngle: 172, torsoLean: 5, shinLean: 3),
+        ),
+    ];
+
+    List<PoseFrame> empty(int milliseconds) => [
+      for (var t = 0; t <= milliseconds; t += 33)
+        PoseFrame(
+          timestamp: Duration(milliseconds: t),
+          points: const {},
+        ),
+    ];
+
+    test('waits in setup and says what to fix', () async {
+      controller().start(setUp: true);
+      expect(state().status, CoachStatus.settingUp);
+
+      await feed(empty(600));
+
+      expect(state().status, CoachStatus.settingUp);
+      expect(state().setup?.problem, SetupProblem.noPerson);
+      expect(player.spoken, [SetupProblem.noPerson.hint]);
+    });
+
+    test('a hint is spoken once while it lasts', () async {
+      controller().start(setUp: true);
+      await feed(empty(2000));
+
+      expect(player.spoken, [SetupProblem.noPerson.hint]);
+    });
+
+    test('starts the set once the athlete holds still in place', () async {
+      controller().start(setUp: true);
+      await feed(standing(500));
+      expect(state().status, CoachStatus.settingUp);
+      expect(state().setup?.progress, greaterThan(0));
+      expect(state().setupFrame, isNotNull);
+
+      await feed(standing(600, from: 533));
+      expect(state().status, CoachStatus.running);
+      expect(state().cue?.text, 'Go');
+    });
+
+    test('counts reps after setup, timed from the start of the set', () async {
+      controller().start(setUp: true);
+      await feed(standing(1100));
+      expect(state().status, CoachStatus.running);
+
+      await feed(
+        squatFrames(
+          const SquatMotion(reps: 2),
+          start: const Duration(milliseconds: 1200),
+        ),
+      );
+
+      expect(state().repCount, 2);
+      final firstRep = state().reps.first.summary;
+      // The rep starts about 2.4 s into the camera stream, but the set only
+      // began about 1 s in, once setup was done.
+      expect(firstRep.startedAt, lessThan(const Duration(milliseconds: 1600)));
+    });
+
+    test('stopping during setup goes back to ready', () async {
+      controller().start(setUp: true);
+      await feed(empty(600));
+
+      controller().stop();
+
+      expect(state().status, CoachStatus.ready);
+      expect(state().setup, isNull);
+      await feed(standing(1100));
+      expect(state().status, CoachStatus.ready);
+    });
+
+    test('starting again during setup does nothing', () async {
+      controller().start(setUp: true);
+      await feed(standing(500));
+
+      controller().start(setUp: true);
+
+      expect(state().setup?.progress, greaterThan(0));
+    });
   });
 
   group('ReplayPoseSource', () {
